@@ -1,0 +1,149 @@
+<!--stock.html裡面的內容是從base.html裡面的內容來的-->
+{% extends "base.html" %}
+
+<!--不同地方的html要貼在這裡面-->
+{% block content%}
+<!--form action:代表我們要把這個form交到哪裡去-->
+<form action="http://127.0.0.1:5000/stock" method="POST">
+  <div class="mb-3">
+    <label for="stock-id" class="form-label">股票代號</label>
+    <!--required:如果你想要求用戶必須填寫此欄位,可以寫這個-->
+    <input
+      type="text"
+      class="form-control {% if error %} is-invalid {% endif %}"
+      id="stock-id"
+      name="stock-id"
+      placeholder="請輸入股票代號(e.g. 0050, 2330...)"
+      required
+    />
+
+    {% if error %}
+    <div id="error-message" class="invalid-feedback">
+      查無 {{ stock_id }} 此股票代號，請重新輸入!
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="mb-3">
+    <label for="stock-num" class="form-label">成交股數</label>
+    <!--min="1":設置最小值為1; -->
+    <input
+      type="number"
+      class="form-control"
+      id="stock-num"
+      name="stock-num"
+      placeholder="請輸入股數(e.g. 1500)"
+      min="1"
+      required
+    />
+  </div>
+
+  <div class="mb-3">
+    <label for="stock-price" class="form-label">成交單價</label>
+    <input
+      type="number"
+      step="0.01"
+      class="form-control"
+      id="stock-price"
+      name="stock-price"
+      placeholder="請輸入單價(e.g. 10.55)"
+      oninput="validateDecimal(this)"
+      min="0"
+      required
+    />
+  </div>
+
+  <div class="mb-3">
+    <label for="processing-fee" class="form-label">手續費</label>
+    <input
+      type="number"
+      class="form-control"
+      id="processing-fee"
+      name="processing-fee"
+      placeholder="請輸入手續費(e.g. 27)"
+      min="1"
+    />
+  </div>
+
+  <div class="mb-3">
+    <label for="tax" class="form-label">交易稅</label>
+    <input
+      type="number"
+      class="form-control"
+      id="tax"
+      name="tax"
+      placeholder="請輸入交易稅(e.g. 8)"
+      min="1"
+    />
+  </div>
+
+  <div class="mb-3">
+    <label for="date" class="form-label">日期</label>
+    <input type="date" class="form-control" id="date" name="date" />
+  </div>
+
+  <button type="submit" class="btn btn-outline-success">提交表單</button>
+</form>
+
+<script>
+  var today = new Date().toISOString().split("T")[0]; // 格式為 YYYY-MM-DD
+  document.getElementById("date").value = today;
+</script>
+
+<!-- JavaScript 來自動隱藏 error 訊息 -->
+<script>
+  // 在頁面加載時或刷新後自動移除錯誤訊息和紅框框
+  window.onload = function () {
+    // 檢查是否是重新整理頁面
+    if (performance.navigation.type === 1) {
+      var errorMessage = document.getElementById("error-message");
+      var stockInput = document.getElementById("stock-id");
+
+      // 隱藏錯誤訊息
+      if (errorMessage) {
+        errorMessage.style.display = "none";
+      }
+
+      // 移除紅框框的 is-invalid 類別
+      if (stockInput) {
+        stockInput.classList.remove("is-invalid");
+      }
+    }
+  };
+
+  // 在2.5秒後自動隱藏錯誤訊息和紅框框
+  setTimeout(function () {
+    var errorMessage = document.getElementById("error-message");
+    var stockInput = document.getElementById("stock-id");
+
+    // 隱藏錯誤訊息
+    if (errorMessage) {
+      errorMessage.style.display = "none";
+    }
+
+    // 移除紅框框的 is-invalid 類別
+    if (stockInput) {
+      stockInput.classList.remove("is-invalid");
+    }
+  }, 2500);
+</script>
+
+<script>
+  function validateDecimal(input) {
+    // 只允許到小數點後兩位
+    var value = input.value;
+
+    // 如果包含小數點
+    if (value.includes(".")) {
+      var decimalPlaces = value.split(".")[1];
+
+      // 檢查小數點後的位數
+      if (decimalPlaces.length > 2) {
+        // 保留前兩位小數
+        input.value = value.slice(0, value.indexOf(".") + 3);
+      }
+    }
+  }
+</script>
+
+{% endblock %}

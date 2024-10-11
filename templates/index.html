@@ -1,0 +1,221 @@
+<!--index.html裡面的內容是從base.html裡面的內容來的-->
+{% extends "base.html" %}
+
+<!--不同地方的html要貼在這裡面-->
+{% block content%}
+<!--Modal-->
+<div
+  class="modal fade"
+  id="introModal"
+  tabindex="-1"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">歡迎👏👏👏</h5>
+        <!-- <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button> -->
+      </div>
+      <div class="modal-body">
+        歡迎來到現金與股票庫存管理系統！<br />
+        此網頁的用途是管理與追蹤現金及股票庫存的變化。
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-success"
+          onclick="handleUnderstand()"
+        >
+          了解了
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="cash-info">
+  <!--&#x1F4B5;是鈔票的emoji-->
+  <h3>現金庫存 💵</h3>
+  <table class="table">
+    <thead class="table-success">
+      <tr>
+        <th scope="col">台幣總額</th>
+        <th scope="col">美金總額</th>
+        <th scope="col">今日匯率</th>
+        <th scope="col">現金總額</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>{{data["td"]}} 元</td>
+        <td>{{data["ud"]}} 元</td>
+        <td>{{data["currency"]}} 元</td>
+        <td>{{data["total"]}} 元</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h5>現金更動紀錄</h5>
+  <!--從bootstrap那邊來的,可以去參考那邊的table的範例-->
+  <table class="table">
+    <thead class="table-success">
+      <tr>
+        <!--col:column-->
+        <th scope="col" style="display: none">ID</th>
+        <th scope="col">台幣</th>
+        <th scope="col">美金</th>
+        <th scope="col">註記</th>
+        <th scope="col">時間</th>
+        <th scope="col">刪除資料</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!--用for loop去把index.py裡的第67行的cash_result裡面的資料塞進表格裡面-->
+      <!--cash_result是個a list of tuple-->
+      {% for data in data["cash_result"] %}
+      <!--這裡面就可以使用data["cash_result"]這個list裡面的每一筆資料-->
+      <tr>
+        <!--style="vertical-align: middle":垂直置中-->
+        <td style="vertical-align: middle; display: none">{{data[0]}}</td>
+        <td style="vertical-align: middle">{{data[1]}}</td>
+        <td style="vertical-align: middle">{{data[2]}}</td>
+        <td style="vertical-align: middle">{{data[3]}}</td>
+        <td style="vertical-align: middle">{{data[4]}}</td>
+        <td>
+          <!--這裡不能只做一個button,而是要作一個form,這是因為我們要透過這個form,
+          當使用者按下「刪除此筆資料」這個button之後,它會寄送一個HTTP的POST request
+          到我們的index.py的伺服器,它寄送request之後,我們的伺服器再來處理這個request-->
+          <form action="/cash-delete" method="post">
+            <!--作一個沒人看到的<input> tag-->
+            <!--當使用者按下「刪除此筆資料」時,data[0]這筆資料就會被到後端的伺服器-->
+            <input type="hidden" name="id" value="{{data[0]}}" />
+            <!--btn-primary:設定button的背景是藍色-->
+            <button class="btn btn-outline-success">刪除此筆資料</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<hr />
+<div id="stock-info">
+  <!--&#x1F4C8;是股票的emoji-->
+  <h3>股票庫存 📈</h3>
+  <table class="table">
+    <thead class="table-success">
+      <tr>
+        <th scope="col">股票代號</th>
+        <th scope="col">持有股數</th>
+        <th scope="col">目前股價</th>
+        <th scope="col">目前市值</th>
+        <th scope="col">股票資產占比(%)</th>
+        <th scope="col">購買總成本(包含手續費)</th>
+        <th scope="col">平均成本</th>
+        <th scope="col">報酬率(%)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for d in data["stock_info"] %}
+      <tr>
+        <!--這裡的d是一個dictionary-->
+        <td>{{d["stock_id"]}}</td>
+        <td>{{d["shares"]}}</td>
+        <td>{{d["current_price"]}}</td>
+        <td>{{d["total_value"]}}</td>
+        <td>{{d["value_percentage"]}}</td>
+        <td>{{d["stock_cost"]}}</td>
+        <td>{{d["average_cost"]}}</td>
+        <td>{{d["rate_of_return"]}}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!--不懂CSS沒關西,因為這都是網頁課程裡的內容-->
+<div id="chart" style="display: flex; flex-wrap: wrap">
+  <!--去判斷要不要顯示figure-->
+  {% if data["show_pic_1"] %}
+  <figure style="flex: 0 1 500px; margin: 10px">
+    <figcaption>股票庫存占比圖</figcaption>
+    <img style="width: 100%" src="/static/piechart.jpg" alt="股票庫存占比圖" />
+  </figure>
+  {% endif %} {% if data["show_pic_2"] %}
+  <figure style="flex: 0 1 500px; margin: 10px">
+    <figcaption>資產比例占比圖</figcaption>
+    <img style="width: 100%" src="/static/piechart2.jpg" alt="資產比例占比圖" />
+  </figure>
+  {% endif %}
+</div>
+
+<hr />
+<div id="footer" style="text-align: right; padding: 10px 0">
+  今日匯率資料來源:
+  <a href="https://tw.rter.info/howto_currencyapi.php" target="_blank">
+    全球即時匯率API
+  </a>
+</div>
+
+<script>
+  // 當頁面所有樣式和資源加載完成
+  window.onload = function () {
+    // 檢查 sessionStorage 中是否有 "hasVisited" 標記
+    if (!sessionStorage.getItem("hasVisited")) {
+      // 第一次訪問，發送請求清空資料
+      navigator.sendBeacon("/clear_data", JSON.stringify({}));
+
+      // 標記為已訪問
+      sessionStorage.setItem("hasVisited", "true");
+
+      // 檢查 sessionStorage 中是否有 "modalShown" 標記
+      if (!sessionStorage.getItem("modalShown")) {
+        // 顯示模態框
+        var myModal = new bootstrap.Modal(
+          document.getElementById("introModal")
+        );
+        myModal.show();
+
+        // 顯示過後將標記儲存到 sessionStorage
+        sessionStorage.setItem("modalShown", "true");
+      }
+    }
+  };
+
+  // 當按下了解了按鈕時的事件處理函數
+  function handleUnderstand() {
+    navigator.sendBeacon("/clear_data", JSON.stringify({})); // 清空資料
+
+    // 隱藏彈出視窗
+    var myModal = bootstrap.Modal.getInstance(
+      document.getElementById("introModal")
+    );
+    myModal.hide(); // 隱藏彈出視窗
+
+    // 重新載入頁面
+    location.reload(); // 重新載入頁面
+  }
+</script>
+
+<!-- 引入 Bootstrap 和 JavaScript -->
+<!--彈跳視窗-->
+<!-- <script>
+  window.onload = function () {
+    // 檢查 sessionStorage 中是否有"modalShown"標記
+    if (!sessionStorage.getItem("modalShown")) {
+      var myModal = new bootstrap.Modal(document.getElementById("introModal"));
+      myModal.show();
+
+      // 顯示過後將標記儲存到 sessionStorage
+      sessionStorage.setItem("modalShown", "true");
+    }
+  };
+</script> -->
+{% endblock %}

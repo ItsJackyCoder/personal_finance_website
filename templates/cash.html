@@ -1,0 +1,65 @@
+<!--cash.html裡面的內容是從base.html裡面的內容來的-->
+{% extends "base.html" %}
+
+<!--不同地方的html要貼在這裡面-->
+{% block content%}
+<!--form action:代表我們要把這個form交到哪裡去-->
+<form action="http://127.0.0.1:5000/cash" method="POST">
+  <div class="mb-3">
+    <!--class不用改,因為bootstrap都有設定過-->
+    <label for="taiwanese-dollars" class="form-label">台幣</label>
+
+    <!--id要和上面的label for一樣-->
+    <!--name:當我們form的表單,把它傳到後端時,它會根據這個name來形成key-value pair,
+    這個key-value pair裡面的key就是name所設定的string,value部分是<input> tag裡面的number-->
+    <input
+      type="number"
+      class="form-control"
+      id="taiwanese-dollars"
+      name="taiwanese-dollars"
+      placeholder="請輸入台幣金額(e.g. 10000)"
+    />
+  </div>
+
+  <div class="mb-3">
+    <label for="us-dollars" class="form-label">美金</label>
+    <!--step="0.01":代表數值可以以0.01的間隔去作調整。如果沒特定設定的話,
+    調整的幅度就是1-->
+    <input
+      step="0.01"
+      type="number"
+      class="form-control"
+      id="us-dollars"
+      name="us-dollars"
+      placeholder="請輸入美金金額(e.g. 500)"
+    />
+  </div>
+
+  <div class="mb-3">
+    <label for="note" class="form-label">備註</label>
+    <!--text:代表是文字-->
+    <input
+      type="text"
+      class="form-control"
+      id="note"
+      name="note"
+      placeholder="請輸入文字(30個字以內)"
+    />
+  </div>
+
+  <div class="mb-3">
+    <label for="date" class="form-label">日期</label>
+    <input type="date" class="form-control" id="date" name="date" />
+  </div>
+
+  <!--這裡的class要跟著bootstrap的規則走-->
+  <!--btn-primary會改變它的顏色-->
+  <button type="submit" class="btn btn-outline-success">提交表單</button>
+</form>
+
+<script>
+  var today = new Date().toISOString().split("T")[0]; // 格式為 YYYY-MM-DD
+  document.getElementById("date").value = today;
+</script>
+
+{% endblock %}
