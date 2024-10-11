@@ -1,0 +1,4 @@
+Flask==2.2.2
+matplotlib==3.7.2
+matplotlib-inline==0.1.6
+SQLAlchemy==1.4.22
