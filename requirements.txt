@@ -347,7 +347,7 @@ SQLAlchemy==1.4.22
 # wcwidth==0.2.5
 # webencodings==0.5.1
 # websocket-client==0.58.0
-# Werkzeug==2.2.3
+Werkzeug==2.2.3
 # whatthepatch==1.0.2
 # wheel==0.44.0
 # widgetsnbextension==4.0.5
