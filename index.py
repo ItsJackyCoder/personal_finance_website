@@ -43,7 +43,7 @@ def close_connection(exception):  # 這個function是被自動執行的
         g.sqlite_db.close()
 
 
-@app.route("/")
+@app.route("https://personal-finance-website.onrender.com")
 def home():
     # 除了要render index.html之外,也要顯示出我們現金庫存的狀況
     conn = get_db()
@@ -240,7 +240,7 @@ def home():
     return render_template("index.html", data=data)
 
 
-@ app.route("/cash")
+@ app.route("https://personal-finance-website.onrender.com/cash")
 def cash_form():
     return render_template("cash.html")
 
@@ -248,7 +248,7 @@ def cash_form():
 # 設定新的route來接收cash.html的表單的內容。
 # POST methods:在HTTP協議中有說,你如果要對你的伺服器去提交資料的話,
 # 這時候就可以使用這個POST methods
-@ app.route("/cash", methods=["POST"])
+@ app.route("https://personal-finance-website.onrender.com/cash", methods=["POST"])
 def sumbit_cash():  # 可以接收到使用者提交出來的資料
     # 1.取得使用者輸入的金額和日期資料
     taiwanese_dollars = 0
@@ -276,10 +276,10 @@ def sumbit_cash():  # 可以接收到使用者提交出來的資料
     conn.commit()
 
     # 3.將使用者導回主頁面
-    return redirect("/")
+    return redirect("https://personal-finance-website.onrender.com")
 
 
-@ app.route("/cash-delete", methods=["POST"])
+@ app.route("https://personal-finance-website.onrender.com/cash-delete", methods=["POST"])
 def cash_delete():
     # request.values["id"]必須得跟index.html第50行看不見<input> tag的name的值一致
     transaction_id = request.values["id"]
@@ -295,7 +295,7 @@ def cash_delete():
     return redirect("/")
 
 
-@app.route("/stock")
+@app.route("https://personal-finance-website.onrender.com/stock")
 def stock_form():
     return render_template("stock.html")
 
@@ -350,10 +350,10 @@ def submit_stock():
     conn.commit()
 
     # 3.將使用者導回主頁面
-    return redirect("/")
+    return redirect("https://personal-finance-website.onrender.com")
 
 
-@app.route('/clear_data', methods=['POST'])
+@app.route('https://personal-finance-website.onrender.com/clear_data', methods=['POST'])
 def clear_data():
     conn = get_db()
     cursor = conn.cursor()
