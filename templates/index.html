@@ -4,41 +4,157 @@
 <!--不同地方的html要貼在這裡面-->
 {% block content%}
 <!--Modal-->
+<!--data-bs-backdrop="static":禁用點擊外部關閉 -->
+<!--data-bs-keyboard="false":禁用Esc關閉 -->
+<!--style="display: none;":預設隱藏此彈跳視窗"-->
+<head>
+  <style>
+    .blurred {
+        filter: blur(10px); /* 調整這個值來控制虛化程度 */
+        transition: filter 0.3s; /* 平滑過渡效果 */
+    }
+</style>
+</head>
 <div
   class="modal fade"
   id="introModal"
   tabindex="-1"
   aria-labelledby="exampleModalLabel"
   aria-hidden="true"
+  data-bs-backdrop="static"  
+  data-bs-keyboard="false" 
+  style="display: none;"   
 >
-  <div class="modal-dialog">
+  <!--登入表單-->
+  <div id="loginPage" class="modal-dialog"> <!--測試-->
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="exampleModalLabel">歡迎👏👏👏</h5>
-        <!-- <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-        ></button> -->
       </div>
-      <div class="modal-body">
+      <div id= "loginForm" class="modal-body">
         歡迎來到現金與股票庫存管理系統！<br />
-        此網頁的用途是管理與追蹤現金及股票庫存的變化。
+        此網頁的用途是管理與追蹤現金及股票庫存的變化。<br /><br />
+
+        <!-- 表單開始 --> 
+        <!--提交form到後端要記得寫method="POST"-->
+        <form id="userCodeForm" onsubmit="return handleFormSubmit(event)" method="POST">
+
+        <!-- 文字框 -->
+        <label for="userCode" class="form-label mb-3">帳號:</label>
+        <div class="input-group mb-3">
+          <input
+            id="userCodeInput"
+            name="userCodeInput"
+            type="text"
+            class="form-control"
+            aria-label="Sizing example input"
+            aria-describedby="inputGroup-sizing-default"
+            placeholder="請輸入10位以內的英文字母或數字"
+            required
+          />
+        </div>
+
+        <label for="pwd" class="form-label mb-3">密碼:</label>
+        <div class="input-group mb-3">
+          <input
+            id="pwdInput"
+            name="pwdInput"
+            type="text"
+            class="form-control"
+            aria-label="Sizing example input"
+            aria-describedby="inputGroup-sizing-default"
+            placeholder="請輸入10位以內的英文字母或數字"
+            required
+          />
+        </div>
+
+        <!-- 用來顯示錯誤的提示 --> <!--要改-->
+        <div id="inputError" style="color: red; display: none;"></div>
       </div>
       <div class="modal-footer">
+        <!--註冊button-->
+        <!--onclick="openRegistrationPage()":呼叫打開註冊頁面的函數-->
+         <button
+         type="button"
+         class="btn btn-success me-auto"
+         onclick="openRegistrationPage()" 
+       >
+         註冊
+       </button>
+
+        <!--不需要在按鈕上添加onclick事件,因為表單會自動調用onsubmit事件-->
         <button
-          type="button"
+          type="submit"
           class="btn btn-success"
-          onclick="handleUnderstand()"
         >
-          了解了
+          登入
         </button>
       </div>
+    </form>
+    <!--表單結束-->
     </div>
+  </div> <!--測試-->
+
+    <!--註冊表單-->
+    <div id="registrationForm" class="modal-dialog" style="display: none;"> <!--測試-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">註冊帳號</h5>
+        </div>
+        <div class="modal-body">
+
+      <form id="registerForm" onsubmit="return handleRegistration(event)" method="POST">
+        <label for="regUserCode" class="form-label mb-3">帳號:</label>
+        <div class="input-group mb-3">
+          <input
+            id="regUserCode"
+            name="regUserCode"
+            type="text"
+            class="form-control"
+            aria-label="Sizing example input"
+            placeholder="請輸入10位以內的英文字母或數字"
+            required
+          />
+        </div>
+
+        <label for="regPwd" class="form-label mb-3">密碼:</label>
+        <div class="input-group mb-3">
+          <input
+            id="regPwd"
+            name="regPwd"
+            type="text"
+            class="form-control"
+            aria-label="Sizing example input"
+            placeholder="請輸入10位以內的英文字母或數字"
+            required
+          />
+        </div>
+
+        <div id="regError" style="color: red; display: none;"></div>
+       </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-success me-auto"
+            onclick="showLoginForm()"
+          >
+            返回登入
+          </button>
+
+          <button
+            type="submit"
+            class="btn btn-success"
+          >
+            確認
+          </button>
+        </div>
+      </form>
+    </div> <!--註冊表單結束-->
+
   </div>
 </div>
 
+<div id="main-content"><!--虛化開始-->
 <div id="cash-info">
   <!--&#x1F4B5;是鈔票的emoji-->
   <h3>現金庫存 💵</h3>
@@ -120,6 +236,7 @@
         <th scope="col">購買總成本(包含手續費)</th>
         <th scope="col">平均成本</th>
         <th scope="col">報酬率(%)</th>
+        <th scope="col">刪除資料</th>
       </tr>
     </thead>
     <tbody>
@@ -134,14 +251,24 @@
         <td>{{d["stock_cost"]}}</td>
         <td>{{d["average_cost"]}}</td>
         <td>{{d["rate_of_return"]}}</td>
+        <td>
+          <form action="/stock-delete" method="post">
+            <!--作一個沒人看到的<input> tag-->
+            <!--當使用者按下「刪除此筆資料」時,data[0]這筆資料就會被到後端的伺服器-->
+            <input type="hidden" name="stock_id" value="{{d['stock_id']}}" />
+            <!--btn-primary:設定button的背景是藍色-->
+            <button class="btn btn-outline-success">刪除此筆資料</button>
+          </form>
+        </td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
 </div>
 
+<hr />
 <!--不懂CSS沒關西,因為這都是網頁課程裡的內容-->
-<div id="chart" style="display: flex; flex-wrap: wrap">
+<div id="chart" style="display: flex; flex-wrap: wrap" >
   <!--去判斷要不要顯示figure-->
   {% if data["show_pic_1"] %}
   <figure style="flex: 0 1 500px; margin: 10px">
@@ -163,45 +290,189 @@
     全球即時匯率API
   </a>
 </div>
+</div> <!--虛化結束-->
 
 <script>
-  // 當頁面所有樣式和資源加載完成
   window.onload = function () {
-    // 檢查 sessionStorage 中是否有 "hasVisited" 標記
-    if (!sessionStorage.getItem("hasVisited")) {
-      // 第一次訪問，發送請求清空資料
-      navigator.sendBeacon("/clear_data", JSON.stringify({}));
+    // 檢查 localStorage 中是否有 "formSubmitted" 標記
+    if (!localStorage.getItem("formSubmitted")) {
+      // 如果尚未提交表單, 顯示模態框
+      var introModal = document.getElementById("introModal");
+        introModal.style.display = "block"; // 顯示模態框
 
-      // 標記為已訪問
-      sessionStorage.setItem("hasVisited", "true");
-
-      // 檢查 sessionStorage 中是否有 "modalShown" 標記
-      if (!sessionStorage.getItem("modalShown")) {
-        // 顯示模態框
-        var myModal = new bootstrap.Modal(
-          document.getElementById("introModal")
-        );
+        var myModal = new bootstrap.Modal(introModal); // 初始化 Bootstrap Modal
         myModal.show();
 
-        // 顯示過後將標記儲存到 sessionStorage
-        sessionStorage.setItem("modalShown", "true");
-      }
+        // 只虛化背景,不虛化彈跳視窗(利用"main-content"包裹住需要虛化的地方)
+        document.getElementById("main-content").classList.add("blurred");
+
+        // 如果尚未提交表單,強制顯示模態框
+        // var myModal = new bootstrap.Modal(document.getElementById("introModal"));
+        // myModal.show();
     }
-  };
+    else {
+        // 如果已提交過表單，則直接載入資料
+        console.log("跳過表單"); //測試用
+    }
 
-  // 當按下了解了按鈕時的事件處理函數
-  function handleUnderstand() {
-    navigator.sendBeacon("/clear_data", JSON.stringify({})); // 清空資料
+};
 
-    // 隱藏彈出視窗
-    var myModal = bootstrap.Modal.getInstance(
-      document.getElementById("introModal")
-    );
-    myModal.hide(); // 隱藏彈出視窗
+  function handleFormSubmit(event) {
+    event.preventDefault(); // 防止表單默認提交
 
-    // 重新載入頁面
-    location.reload(); // 重新載入頁面
-  }
+    var userCodeInput = document.getElementById("userCodeInput").value;
+    var pwdInput = document.getElementById("pwdInput").value;
+
+    fetch("/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({ userCodeInput: userCodeInput, pwdInput:pwdInput }), // 轉換為 URL 編碼格式
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === "success") {
+            // 表單提交成功,儲存已提交的狀態到localStorage(這樣即使開其他分頁也會保留紀錄)
+            //sessionStorage:只會保留當前頁面的狀態
+            localStorage.setItem("formSubmitted", "true");
+
+            // 隱藏彈出視窗並重新載入頁面
+            var myModal = bootstrap.Modal.getInstance(document.getElementById("introModal"));
+            myModal.hide();
+
+            //移除需化背景
+            myModal._element.addEventListener('hidden.bs.modal', function () {
+            document.getElementById("main-content").classList.remove("blurred");});
+            
+            location.reload();
+        } else {
+            // 顯示錯誤訊息並保持彈出視窗開啟
+            var inputError = document.getElementById("inputError");
+            inputError.textContent = data.message; // 顯示錯誤訊息
+            inputError.style.display = "block"; // 顯示錯誤提示
+
+            // 在1.3秒後隱藏錯誤訊息
+            setTimeout(() => {
+                inputError.style.display = "none"; // 隱藏錯誤提示
+            }, 1300); // 1300毫秒，即1.3秒
+            
+        }
+    })
+    .catch(error => {
+        console.error("網路錯誤:", error);
+    });
+    }
+
+    //註冊頁面的「確認」button
+    function handleRegistration(event) {
+    event.preventDefault(); // 防止表單默認提交
+
+    var regUserCode = document.getElementById("regUserCode").value;
+    var regPwd = document.getElementById("regPwd").value;
+
+    fetch("/register", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({ regUserCode: regUserCode, regPwd: regPwd }), // 轉換為 URL 編碼格式
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === "success") {
+            // 表單提交成功,儲存已提交的狀態到localStorage(這樣即使開其他分頁也會保留紀錄)
+            //sessionStorage:只會保留當前頁面的狀態
+            localStorage.setItem("formSubmitted", "true");
+
+            // 隱藏彈出視窗並重新載入頁面
+            var myModal = bootstrap.Modal.getInstance(document.getElementById("introModal"));
+            myModal.hide();
+
+            //移除需化背景
+            myModal._element.addEventListener('hidden.bs.modal', function () {
+            document.getElementById("main-content").classList.remove("blurred");});
+            
+            location.reload();
+        } else {
+            // 顯示錯誤訊息並保持彈出視窗開啟
+            var regError = document.getElementById("regError");
+            regError.textContent = data.message; // 顯示錯誤訊息
+            regError.style.display = "block"; // 顯示錯誤提示
+
+            // 在1.3秒後隱藏錯誤訊息
+            setTimeout(() => {
+                regError.style.display = "none"; // 隱藏錯誤提示
+            }, 1300); // 1300毫秒，即1.3秒
+            
+        }
+    })
+    .catch(error => {
+        console.error("網路錯誤:", error);
+    });
+    }
+
+    function openRegistrationPage() {
+      // 隱藏登入表單，顯示註冊表單
+      document.getElementById('registrationForm').style.display = 'block';
+      document.getElementById('loginPage').style.display = 'none';
+      document.getElementById('exampleModalLabel').textContent = "註冊帳號";
+
+      //可以用來測試button是否有被click
+      // alert("註冊按鈕被點擊了！");
+    }
+
+    function showLoginForm() {
+      // 隱藏註冊表單，顯示登入表單
+      document.getElementById('loginPage').style.display = 'block';
+      document.getElementById('registrationForm').style.display = 'none';
+      document.getElementById('exampleModalLabel').textContent = "歡迎👏👏👏";
+    }
+
+
+  // 當表單提交時的事件處理函數
+// function handleFormSubmit(event) {
+//   event.preventDefault(); // 阻止表單的默認提交行為
+
+//   var userCodeInput = document.getElementById("userCodeInput").value;
+//   var inputError = document.getElementById("inputError");
+
+//   // 檢查是否有輸入代號
+//   if (!userCodeInput.trim()) {
+//     // 如果沒有輸入，顯示錯誤提示並保持彈出視窗
+//     inputError.style.display = "block";
+//   } else {
+//     // 如果有輸入，隱藏錯誤提示並繼續處理邏輯
+//     inputError.style.display = "none";
+
+//     // 使用 fetch 將資料發送到伺服器
+//     fetch("/submit_code", {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       body: JSON.stringify({ code: userCodeInput }), // 將使用者的輸入作為請求體
+//     })
+//       .then((response) => {
+//         if (response.ok) {
+//           // 隱藏彈出視窗
+//           var myModal = bootstrap.Modal.getInstance(
+//             document.getElementById("introModal")
+//           );
+//           myModal.hide(); // 隱藏彈出視窗
+
+//           // 重新載入頁面
+//           location.reload();
+//         } else {
+//           // 這裡可以處理伺服器返回的錯誤，例如顯示提示
+//           console.error("伺服器錯誤");
+//         }
+//       })
+//       .catch((error) => {
+//         console.error("網路錯誤:", error);
+//       });
+//   }
+// }
 </script>
 
 <!-- 引入 Bootstrap 和 JavaScript -->

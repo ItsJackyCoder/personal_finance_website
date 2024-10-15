@@ -4,8 +4,9 @@
 # g:flask連接資料庫所需要的東西
 # redirect:可以讓使用者導回主畫面的模組
 import os  # 為了隱藏圓餅圖的文字(如果static裡面沒有資料就不顯示文字)
-from flask import Flask, render_template, request, g, redirect, flash
+from flask import Flask, render_template, request, g, redirect, session, jsonify
 import sqlite3
+import uuid
 import requests  # 為了全球即時匯率的API而使用的module
 import math
 import matplotlib.pyplot as plt
@@ -30,6 +31,42 @@ def get_db():
     return g.sqlite_db
 
 
+# # 檢查使用者 session 是否存在於資料庫
+# def check_user_in_db(session_id):
+#     pass
+    # conn = get_db()
+    # cursor = conn.cursor()
+    # cursor.execute("SELECT * FROM users WHERE sessionID = ?", (session_id,))
+
+    # user = cursor.fetchone()
+
+    # return user
+
+    # 插入新的使用者資料到資料庫
+
+
+# def insert_user(session_id):
+#     pass
+    # conn = get_db()
+    # cursor = conn.cursor()
+    # cursor.execute("INSERT INTO users (sessionID) VALUES (?)", (session_id,))
+
+    # conn.commit()
+
+    # 刪除使用者資料
+
+
+# def delete_user(session_id):
+#     pass
+    # conn = get_db()
+    # cursor = conn.cursor()
+    # cursor.execute("DELETE FROM users WHERE sessionID = ?", (session_id,))
+    # cursor.execute("DELETE FROM cash WHERE sessionID = ?", (session_id,))
+    # cursor.execute("DELETE FROM stock WHERE sessionID = ?", (session_id,))
+
+    # conn.commit()
+
+
 @app.teardown_appcontext
 # exception代表要是有發生什麼exception的話,它就會在此參數的位置(在這裡老師不會用到,但還是寫了)
 # close_connection()在任何HTTP request結束時,都會被執行一次。
@@ -43,13 +80,72 @@ def close_connection(exception):  # 這個function是被自動執行的
         g.sqlite_db.close()
 
 
+# @app.route('/submit_code', methods=['POST'])
+# def submit_code():
+#     data = request.json
+#     code = data.get('code')
+
+#     # 儲存到資料庫
+#     conn = get_db()
+#     cursor = conn.cursor()
+#     cursor.execute('INSERT INTO users (userID) VALUES (?)', (code,))
+#     cursor.commit()
+
+#     return jsonify({"status": "success"})
+
+
+@app.route('/logout', methods=['POST'])
+def logout():
+    # 刪除 session 中的 user_id
+    session.clear()  # 清除 session 表示登出
+
+    return jsonify({"message": "Logged out successfully!"})
+
+
+# 待改正
+@app.route('/login', methods=['GET'])
+def check_login_status():
+    if 'user_id' in session:
+        # 如果 session 裡有 user_id，表示已登入
+        return jsonify({"is_logged_in": True})
+    else:
+        # 沒有 session，表示未登入
+        return jsonify({"is_logged_in": False})
+
+
 @app.route("/")
 def home():
+    # 如果 session 不存在，生成新的 session_id
+    # if 'session_id' not in session:
+    #     session['session_id'] = str(uuid.uuid4())
+
+    # session_id = session['session_id']
+
+    # # 檢查使用者是否已經在資料庫中
+    # user = check_user_in_db(session_id)
+
+    # if not user:
+    #     # 如果使用者不在資料庫中，插入資料
+    #     insert_user(session_id)
+
+    # print(session_id)
+
+    userID = session.get('user_id')
+    # userID = request.values["userCodeInput"]
+
     # 除了要render index.html之外,也要顯示出我們現金庫存的狀況
     conn = get_db()
     cursor = conn.cursor()
-    result = cursor.execute("select * from cash order by date_info ASC")  # 升序
+    result = cursor.execute(
+        "select * from cash where userID = ? order by date_info ASC", (userID,))  # 升序
     cash_result = result.fetchall()  # a list of tuple
+
+    # 測試用
+    # print(userID)
+    # print(cash_result)
+    # print(cursor.execute("select * from cash").fetchall())
+    # print(cursor.execute("select * from stock").fetchall())
+    # print(cursor.execute("select * from users").fetchall())
 
     # 計算台幣與美金的總額
     taiwanese_dollars = 0
@@ -71,7 +167,8 @@ def home():
                        currency["USDTWD"]["Exrate"])  # 因為美金換成台幣有小數點,想把它換成整數
 
     # 取得所有股票資訊
-    result2 = cursor.execute("""select * from stock""")
+    result2 = cursor.execute(
+        """select * from stock where userID = ?""", (userID,))
 
     # a list of tuple
     # e.g. [(1, '0050', 100, 120.0, 15, 0, '2024-10-10')]
@@ -90,9 +187,12 @@ def home():
     # 計算單一股票資訊
     stock_info = []
 
+    # 標記每個股票的識別碼
+    # stock_count = 0
+
     for stock in unique_stock_list:
         result = cursor.execute(
-            """select * from stock where stock_id =?""", (stock,))
+            """select * from stock where stock_id = ? and userID = ?""", (stock, userID))
 
         result = result.fetchall()  # 這裡的result是一個list
 
@@ -134,6 +234,8 @@ def home():
         # 因為index.html的報酬率是用百分比呈現的,所以要*100
         rate_of_return = round((total_value - stock_cost)
                                * 100 / stock_cost, 2)
+
+        # stock_count += 1
 
         # 把上面所有算的單一個股的資訊把它存進stock_info裡面
         stock_info.append({"stock_id": stock, "stock_cost": stock_cost, "total_value": total_value,
@@ -240,6 +342,104 @@ def home():
     return render_template("index.html", data=data)
 
 
+@ app.route("/", methods=["POST"])
+def sumbit_userID():  # 可以接收到使用者提交出來的資料
+    # 1.取得使用者輸入的金額和日期資料
+    # 這些request.values的key就是cash.html裡的<input> tag裡的name所設定的值
+    userID = request.values["userCodeInput"]
+    pwd = request.values["pwdInput"]
+
+    # 測試用-->有成功抓到使用者輸入的正確資訊
+    print(userID)
+    print(pwd)
+
+    # 2.更新數據庫資料
+    # get_db():裡面的code,如果有必要的話,會自動幫我們連接到資料庫
+    conn = get_db()
+    cursor = conn.cursor()
+    result = cursor.execute("""select * from users""")
+
+    users_result = result.fetchall()
+    total_users = {}
+
+    for data in users_result:
+        name, password = data
+
+        total_users[name] = password
+
+    # 測試用
+    print(total_users)
+
+    # 如果帳號不在DB裡,代表是新用戶,所以直接存入DB裡面
+    # if userID not in total_users:
+    #     cursor.execute("""insert into users (userID, password) values (?,?)""",
+    #                    (userID, pwd))
+
+    #     # 儲存在session中,以讓其他的route也能調用此變數
+    #     session['user_id'] = userID
+
+    #     conn.commit()
+
+    #     return jsonify({"status": "success"})
+
+    # 帳密都有在DB的話,就給登入
+    if (userID, pwd) in users_result:
+
+        # 儲存在session中,以讓其他的route也能調用此變數
+        session['user_id'] = userID
+
+        return jsonify({"status": "success"})
+
+    # 如果有此帳號,但沒有此密碼,那就print出「密碼錯誤」
+    elif userID in total_users and total_users[userID] != pwd:
+        return jsonify({"status": "error", "message": "密碼錯誤!!!"})
+
+    elif userID not in total_users:
+        return jsonify({"status": "error", "message": "查無此帳號!!!"})
+
+
+@ app.route("/register", methods=["POST"])
+def register_userID():
+    regID = request.values["regUserCode"]
+    regPwd = request.values["regPwd"]
+
+    # 測試用-->有成功抓到使用者輸入的正確資訊
+    print(regID)
+    print(regPwd)
+
+    # 2.更新數據庫資料
+    # get_db():裡面的code,如果有必要的話,會自動幫我們連接到資料庫
+    conn = get_db()
+    cursor = conn.cursor()
+    result = cursor.execute("""select * from users""")
+
+    users_result = result.fetchall()
+    total_users = {}
+
+    for data in users_result:
+        name, password = data
+
+        total_users[name] = password
+
+    print(total_users)
+
+    # 如果沒有重複的帳號,就給註冊
+    if regID not in total_users:
+        cursor.execute("""insert into users (userID, password) values (?,?)""",
+                       (regID, regPwd))
+
+        # 儲存在session中,以讓其他的route也能調用此變數
+        session['user_id'] = regID
+
+        conn.commit()
+
+        return jsonify({"status": "success"})
+
+    # 如果有此帳號,那就print出「帳號已有人使用!」
+    elif regID in total_users:
+        return jsonify({"status": "error", "message": "帳號已有人使用!!!"})
+
+
 @ app.route("/cash")
 def cash_form():
     return render_template("cash.html")
@@ -250,6 +450,8 @@ def cash_form():
 # 這時候就可以使用這個POST methods
 @ app.route("/cash", methods=["POST"])
 def sumbit_cash():  # 可以接收到使用者提交出來的資料
+    userID = session.get('user_id')
+
     # 1.取得使用者輸入的金額和日期資料
     taiwanese_dollars = 0
     us_dollars = 0
@@ -270,8 +472,8 @@ def sumbit_cash():  # 可以接收到使用者提交出來的資料
     cursor = conn.cursor()
 
     # transaction_id會自己去生成
-    cursor.execute("""insert into cash (taiwanese_dollars, us_dollars, note, date_info) values (?, ?, ?, ?)""",
-                   (taiwanese_dollars, us_dollars, note, date))
+    cursor.execute("""insert into cash (taiwanese_dollars, us_dollars, note, date_info, userID) values (?, ?, ?, ?, ?)""",
+                   (taiwanese_dollars, us_dollars, note, date, userID))
 
     conn.commit()
 
@@ -283,11 +485,12 @@ def sumbit_cash():  # 可以接收到使用者提交出來的資料
 def cash_delete():
     # request.values["id"]必須得跟index.html第50行看不見<input> tag的name的值一致
     transaction_id = request.values["id"]
+    userID = session.get('user_id')
 
     conn = get_db()
     cursor = conn.cursor()
     cursor.execute(
-        """delete from cash where transaction_id=?""", (transaction_id, ))
+        """delete from cash where transaction_id = ? and userID = ?""", (transaction_id, userID))
 
     conn.commit()
 
@@ -295,13 +498,15 @@ def cash_delete():
     return redirect("/")
 
 
-@app.route("/stock")
+@ app.route("/stock")
 def stock_form():
     return render_template("stock.html")
 
 
-@app.route("/stock", methods=["POST"])
+@ app.route("/stock", methods=["POST"])
 def submit_stock():
+    userID = session.get('user_id')
+
     # 1.取得股票資訊、日期資料
     url = "https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&stockNo=" + \
         request.values['stock-id']
@@ -317,7 +522,7 @@ def submit_stock():
         stock_id = request.values['stock-id']
 
     else:
-        flash("查無此股票代碼,請重新輸入!")  # 設置一次性訊息
+        # flash("查無此股票代碼,請重新輸入!")  # 設置一次性訊息
         error = True  # 設置錯誤標記
         stock_id = request.values['stock-id']
 
@@ -344,8 +549,8 @@ def submit_stock():
     cursor = conn.cursor()
 
     # transaction_id可以不用管它
-    cursor.execute("""insert into stock (stock_id, stock_num, stock_price, processing_fee, tax, date_info) values (?, ?, ?, ?, ?, ?)""",
-                   (stock_id, stock_num, stock_price, processing_fee, tax, date))
+    cursor.execute("""insert into stock (stock_id, stock_num, stock_price, processing_fee, tax, date_info, userID) values (?, ?, ?, ?, ?, ?, ?)""",
+                   (stock_id, stock_num, stock_price, processing_fee, tax, date, userID))
 
     conn.commit()
 
@@ -353,17 +558,53 @@ def submit_stock():
     return redirect("/")
 
 
-@app.route('/clear_data', methods=['POST'])
-def clear_data():
+@ app.route("/stock-delete", methods=["POST"])
+def stock_delete():
+    # request.values["id"]必須得跟index.html第50行看不見<input> tag的name的值一致
+    stock_id = request.values["stock_id"]
+    userID = session.get('user_id')
+
     conn = get_db()
     cursor = conn.cursor()
-
-    cursor.execute("DELETE FROM cash")  # 或其他需要清空的資料表
-    cursor.execute("DELETE FROM stock")
+    cursor.execute(
+        """delete from stock where stock_id = ? and userID = ?""", (stock_id, userID))
 
     conn.commit()
 
-    return '', 204  # 返回204表示請求成功但不返回內容
+    # 當使用者刪除某一筆資料後,把頁面重新導回到首頁
+    return redirect("/")
+
+
+# 使用者關閉頁面後刪除資料的 API
+# @ app.route('/delete_user', methods=['POST'])
+# def handle_user_deletion():
+#     session_id = session.get('session_id')
+
+#     if session_id:
+#         delete_user(session_id)
+#         session.pop('session_id', None)  # 清除 session
+
+#     return '', 204
+
+
+# @ app.route('/clear_session', methods=['POST'])
+# def clear_session():
+#     session.pop('session_id', None)  # 移除 session_id
+#     return '', 204  # No content
+
+
+# 之前的
+# @ app.route('/clear_data', methods=['POST'])
+# def clear_data():
+#     conn = get_db()
+#     cursor = conn.cursor()
+
+#     cursor.execute("DELETE FROM cash")  # 或其他需要清空的資料表
+#     cursor.execute("DELETE FROM stock")
+
+#     conn.commit()
+
+#     return '', 204  # 返回204表示請求成功但不返回內容
 
 
 if __name__ == "__main__":

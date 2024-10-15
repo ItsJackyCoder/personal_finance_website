@@ -32,7 +32,7 @@
         <div class="collapse navbar-collapse" id="navbarNav">
           <!--herf="#":#代表不會到任何的網站-->
           <!--class="navbar-brand":標示這個<a> tag是我們的navbar的標示-->
-          <a class="navbar-brand text-light" herf="#">
+          <a class="navbar-brand text-light" href="#">
             <img
               src="{{ url_for('static', filename='images/finance.jpg') }}"
               alt="個人理財網站的標誌"
@@ -52,6 +52,15 @@
             </li>
           </ul>
           <span class="navbar-text ms-auto text-light">
+            <!--登出的button-->
+            <button
+              id="logoutBtn"
+              type="button"
+              class="btn btn-outline-light me-3"
+              onclick="handleLogout()"
+            >
+              登出
+            </button>
             Design by :
             <img
               src="{{ url_for('static', filename='images/pie.jpeg') }}"
@@ -74,5 +83,64 @@
       integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
       crossorigin="anonymous"
     ></script>
+
+    <script>
+      // 當頁面加載時檢查用戶的登入狀態---待改
+      // function login() {
+      //   fetch("/login") // 您的 Flask 路由
+      //     .then((response) => response.json())
+      //     .then((data) => {
+      //       if (data.is_logged_in) {
+      //         // 如果已登入，將按鈕文字改為 "登出"
+      //         document.getElementById("logoutBtn").innerText = "登出";
+      //       }
+      //     })
+      //     .catch((error) => console.error("Error:", error));
+      // };
+
+      // 監聽分頁關閉或刷新事件
+      // window.onbeforeunload = function () {
+      //   // 清除 localStorage 資料
+      //   localStorage.clear();
+      // };
+
+      function handleLogout() {
+        fetch("/logout", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.message === "Logged out successfully!") {
+              // 清除 localStorage 資料
+              localStorage.clear();
+
+              // 登出成功後隱藏按鈕
+              document.getElementById("logoutBtn").style.display = "none";
+              location.replace("/"); //重新載入頁面
+
+              //alert("登出成功"); //暫時不寫了～～～
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+      }
+
+      // 判斷登錄狀態來顯示/隱藏登出按鈕
+      //   window.onload = function () {
+      //     fetch("/check_login_status")
+      //       .then((response) => response.json())
+      //       .then((data) => {
+      //         if (!data.loggedIn) {
+      //           document.getElementById("logoutBtn").style.display = "none";
+      //         }
+      //       })
+      //       .catch((error) => console.error("Error:", error));
+      //   };
+      //
+    </script>
   </body>
 </html>
