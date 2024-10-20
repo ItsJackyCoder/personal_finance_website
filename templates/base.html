@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>個人理財頁面</title>
+    <title>Personal Finance Website</title>
 
     <!--bootstrap的網站-->
     <!--好處是當使用者用手機瀏覽此網站時,螢幕變成長方形,navbar會收進去,變成下拉式選單-->
@@ -38,17 +38,21 @@
               alt="個人理財網站的標誌"
               style="width: 60px; height: 60px; margin-right: 8px"
             />
-            個人理財網站
+            Personal Finance Website
           </a>
           <ul class="navbar-nav">
             <li class="nav-item">
-              <a class="nav-link text-light" href="/">首頁</a>
+              <a class="nav-link text-light" href="/">Home</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link text-light" href="/cash">現金庫存表單</a>
+              <a class="nav-link text-light" href="/cash"
+                >Cash Inventory Form</a
+              >
             </li>
             <li class="nav-item">
-              <a class="nav-link text-light" href="/stock">股票庫存表單</a>
+              <a class="nav-link text-light" href="/stock"
+                >Stock Inventory Form</a
+              >
             </li>
           </ul>
           <span class="navbar-text ms-auto text-light">
@@ -59,7 +63,7 @@
               class="btn btn-outline-light me-3"
               onclick="handleLogout()"
             >
-              登出
+              Logout
             </button>
             Design by :
             <img
@@ -85,25 +89,6 @@
     ></script>
 
     <script>
-      // 當頁面加載時檢查用戶的登入狀態---待改
-      // function login() {
-      //   fetch("/login") // 您的 Flask 路由
-      //     .then((response) => response.json())
-      //     .then((data) => {
-      //       if (data.is_logged_in) {
-      //         // 如果已登入，將按鈕文字改為 "登出"
-      //         document.getElementById("logoutBtn").innerText = "登出";
-      //       }
-      //     })
-      //     .catch((error) => console.error("Error:", error));
-      // };
-
-      // 監聽分頁關閉或刷新事件
-      // window.onbeforeunload = function () {
-      //   // 清除 localStorage 資料
-      //   localStorage.clear();
-      // };
-
       function handleLogout() {
         fetch("/logout", {
           method: "POST",
@@ -128,19 +113,6 @@
             console.error("Error:", error);
           });
       }
-
-      // 判斷登錄狀態來顯示/隱藏登出按鈕
-      //   window.onload = function () {
-      //     fetch("/check_login_status")
-      //       .then((response) => response.json())
-      //       .then((data) => {
-      //         if (!data.loggedIn) {
-      //           document.getElementById("logoutBtn").style.display = "none";
-      //         }
-      //       })
-      //       .catch((error) => console.error("Error:", error));
-      //   };
-      //
     </script>
   </body>
 </html>

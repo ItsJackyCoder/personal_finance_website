@@ -31,42 +31,6 @@ def get_db():
     return g.sqlite_db
 
 
-# # 檢查使用者 session 是否存在於資料庫
-# def check_user_in_db(session_id):
-#     pass
-    # conn = get_db()
-    # cursor = conn.cursor()
-    # cursor.execute("SELECT * FROM users WHERE sessionID = ?", (session_id,))
-
-    # user = cursor.fetchone()
-
-    # return user
-
-    # 插入新的使用者資料到資料庫
-
-
-# def insert_user(session_id):
-#     pass
-    # conn = get_db()
-    # cursor = conn.cursor()
-    # cursor.execute("INSERT INTO users (sessionID) VALUES (?)", (session_id,))
-
-    # conn.commit()
-
-    # 刪除使用者資料
-
-
-# def delete_user(session_id):
-#     pass
-    # conn = get_db()
-    # cursor = conn.cursor()
-    # cursor.execute("DELETE FROM users WHERE sessionID = ?", (session_id,))
-    # cursor.execute("DELETE FROM cash WHERE sessionID = ?", (session_id,))
-    # cursor.execute("DELETE FROM stock WHERE sessionID = ?", (session_id,))
-
-    # conn.commit()
-
-
 @app.teardown_appcontext
 # exception代表要是有發生什麼exception的話,它就會在此參數的位置(在這裡老師不會用到,但還是寫了)
 # close_connection()在任何HTTP request結束時,都會被執行一次。
@@ -80,20 +44,6 @@ def close_connection(exception):  # 這個function是被自動執行的
         g.sqlite_db.close()
 
 
-# @app.route('/submit_code', methods=['POST'])
-# def submit_code():
-#     data = request.json
-#     code = data.get('code')
-
-#     # 儲存到資料庫
-#     conn = get_db()
-#     cursor = conn.cursor()
-#     cursor.execute('INSERT INTO users (userID) VALUES (?)', (code,))
-#     cursor.commit()
-
-#     return jsonify({"status": "success"})
-
-
 @app.route('/logout', methods=['POST'])
 def logout():
     # 刪除 session 中的 user_id
@@ -103,33 +53,18 @@ def logout():
 
 
 # 待改正
-@app.route('/login', methods=['GET'])
-def check_login_status():
-    if 'user_id' in session:
-        # 如果 session 裡有 user_id，表示已登入
-        return jsonify({"is_logged_in": True})
-    else:
-        # 沒有 session，表示未登入
-        return jsonify({"is_logged_in": False})
+# @app.route('/login', methods=['GET'])
+# def check_login_status():
+#     if 'user_id' in session:
+#         # 如果 session 裡有 user_id，表示已登入
+#         return jsonify({"is_logged_in": True})
+#     else:
+#         # 沒有 session，表示未登入
+#         return jsonify({"is_logged_in": False})
 
 
 @app.route("/")
 def home():
-    # 如果 session 不存在，生成新的 session_id
-    # if 'session_id' not in session:
-    #     session['session_id'] = str(uuid.uuid4())
-
-    # session_id = session['session_id']
-
-    # # 檢查使用者是否已經在資料庫中
-    # user = check_user_in_db(session_id)
-
-    # if not user:
-    #     # 如果使用者不在資料庫中，插入資料
-    #     insert_user(session_id)
-
-    # print(session_id)
-
     userID = session.get('user_id')
     # userID = request.values["userCodeInput"]
 
@@ -186,9 +121,6 @@ def home():
 
     # 計算單一股票資訊
     stock_info = []
-
-    # 標記每個股票的識別碼
-    # stock_count = 0
 
     for stock in unique_stock_list:
         result = cursor.execute(
@@ -367,21 +299,6 @@ def sumbit_userID():  # 可以接收到使用者提交出來的資料
 
         total_users[name] = password
 
-    # 測試用
-    print(total_users)
-
-    # 如果帳號不在DB裡,代表是新用戶,所以直接存入DB裡面
-    # if userID not in total_users:
-    #     cursor.execute("""insert into users (userID, password) values (?,?)""",
-    #                    (userID, pwd))
-
-    #     # 儲存在session中,以讓其他的route也能調用此變數
-    #     session['user_id'] = userID
-
-    #     conn.commit()
-
-    #     return jsonify({"status": "success"})
-
     # 帳密都有在DB的話,就給登入
     if (userID, pwd) in users_result:
 
@@ -392,10 +309,10 @@ def sumbit_userID():  # 可以接收到使用者提交出來的資料
 
     # 如果有此帳號,但沒有此密碼,那就print出「密碼錯誤」
     elif userID in total_users and total_users[userID] != pwd:
-        return jsonify({"status": "error", "message": "密碼錯誤!!!"})
+        return jsonify({"status": "error", "message": "Incorrect password!!!"})
 
     elif userID not in total_users:
-        return jsonify({"status": "error", "message": "查無此帳號!!!"})
+        return jsonify({"status": "error", "message": "Account not found!!!"})
 
 
 @ app.route("/register", methods=["POST"])
@@ -437,7 +354,7 @@ def register_userID():
 
     # 如果有此帳號,那就print出「帳號已有人使用!」
     elif regID in total_users:
-        return jsonify({"status": "error", "message": "帳號已有人使用!!!"})
+        return jsonify({"status": "error", "message": "Account is already in use!!!"})
 
 
 @ app.route("/cash")
@@ -575,43 +492,5 @@ def stock_delete():
     return redirect("/")
 
 
-# 使用者關閉頁面後刪除資料的 API
-# @ app.route('/delete_user', methods=['POST'])
-# def handle_user_deletion():
-#     session_id = session.get('session_id')
-
-#     if session_id:
-#         delete_user(session_id)
-#         session.pop('session_id', None)  # 清除 session
-
-#     return '', 204
-
-
-# @ app.route('/clear_session', methods=['POST'])
-# def clear_session():
-#     session.pop('session_id', None)  # 移除 session_id
-#     return '', 204  # No content
-
-
-# 之前的
-# @ app.route('/clear_data', methods=['POST'])
-# def clear_data():
-#     conn = get_db()
-#     cursor = conn.cursor()
-
-#     cursor.execute("DELETE FROM cash")  # 或其他需要清空的資料表
-#     cursor.execute("DELETE FROM stock")
-
-#     conn.commit()
-
-#     return '', 204  # 返回204表示請求成功但不返回內容
-
-
 if __name__ == "__main__":
-    import time
-
-    start_time = time.time()  # 開始計時
     app.run(debug=True)
-    end_time = time.time()  # 結束計時
-
-    print(f"執行時間: {end_time - start_time:.2f} 秒")  # 輸出執行時間

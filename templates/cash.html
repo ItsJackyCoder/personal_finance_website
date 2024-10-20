@@ -7,7 +7,7 @@
 <form action="/cash" method="POST">
   <div class="mb-3">
     <!--class不用改,因為bootstrap都有設定過-->
-    <label for="taiwanese-dollars" class="form-label">台幣</label>
+    <label for="taiwanese-dollars" class="form-label">TWD </label>
 
     <!--id要和上面的label for一樣-->
     <!--name:當我們form的表單,把它傳到後端時,它會根據這個name來形成key-value pair,
@@ -17,12 +17,12 @@
       class="form-control"
       id="taiwanese-dollars"
       name="taiwanese-dollars"
-      placeholder="請輸入台幣金額(e.g. 10000)"
+      placeholder="Please enter TWD amount(e.g.10000)"
     />
   </div>
 
   <div class="mb-3">
-    <label for="us-dollars" class="form-label">美金</label>
+    <label for="us-dollars" class="form-label">USD</label>
     <!--step="0.01":代表數值可以以0.01的間隔去作調整。如果沒特定設定的話,
     調整的幅度就是1-->
     <input
@@ -31,30 +31,30 @@
       class="form-control"
       id="us-dollars"
       name="us-dollars"
-      placeholder="請輸入美金金額(e.g. 500)"
+      placeholder="Please enter USD amount(e.g.500)"
     />
   </div>
 
   <div class="mb-3">
-    <label for="note" class="form-label">備註</label>
+    <label for="note" class="form-label">Notes</label>
     <!--text:代表是文字-->
     <input
       type="text"
       class="form-control"
       id="note"
       name="note"
-      placeholder="請輸入文字(30個字以內)"
+      placeholder="Please enter text(within 30 characters)"
     />
   </div>
 
   <div class="mb-3">
-    <label for="date" class="form-label">日期</label>
+    <label for="date" class="form-label">Date</label>
     <input type="date" class="form-control" id="date" name="date" />
   </div>
 
   <!--這裡的class要跟著bootstrap的規則走-->
   <!--btn-primary會改變它的顏色-->
-  <button type="submit" class="btn btn-outline-success">提交表單</button>
+  <button type="submit" class="btn btn-outline-success">Submit</button>
 </form>
 
 <script>

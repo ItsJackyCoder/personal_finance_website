@@ -6,47 +6,47 @@
 <!--form action:代表我們要把這個form交到哪裡去-->
 <form action="/stock" method="POST">
   <div class="mb-3">
-    <label for="stock-id" class="form-label">股票代號</label>
+    <label for="stock-id" class="form-label">Stock Code</label>
     <!--required:如果你想要求用戶必須填寫此欄位,可以寫這個-->
     <input
       type="text"
       class="form-control {% if error %} is-invalid {% endif %}"
       id="stock-id"
       name="stock-id"
-      placeholder="請輸入股票代號(e.g. 0050, 2330...)"
+      placeholder="Please enter Stock Code(e.g.0050, 2330...)"
       required
     />
 
     {% if error %}
     <div id="error-message" class="invalid-feedback">
-      查無 {{ stock_id }} 此股票代號，請重新輸入!
+      Stock code: {{ stock_id }} not found, please re-enter!
     </div>
     {% endif %}
   </div>
 
   <div class="mb-3">
-    <label for="stock-num" class="form-label">成交股數</label>
+    <label for="stock-num" class="form-label">Number of Shares Traded</label>
     <!--min="1":設置最小值為1; -->
     <input
       type="number"
       class="form-control"
       id="stock-num"
       name="stock-num"
-      placeholder="請輸入股數(e.g. 1500)"
+      placeholder="Please enter number of shares(e.g.1500)"
       min="1"
       required
     />
   </div>
 
   <div class="mb-3">
-    <label for="stock-price" class="form-label">成交單價</label>
+    <label for="stock-price" class="form-label">Transaction Price</label>
     <input
       type="number"
       step="0.01"
       class="form-control"
       id="stock-price"
       name="stock-price"
-      placeholder="請輸入單價(e.g. 10.55)"
+      placeholder="Please enter price(e.g.10.55)"
       oninput="validateDecimal(this)"
       min="0"
       required
@@ -54,35 +54,35 @@
   </div>
 
   <div class="mb-3">
-    <label for="processing-fee" class="form-label">手續費</label>
+    <label for="processing-fee" class="form-label">Transaction Fee</label>
     <input
       type="number"
       class="form-control"
       id="processing-fee"
       name="processing-fee"
-      placeholder="請輸入手續費(e.g. 27)"
+      placeholder="Please enter transaction fee(e.g.27)"
       min="1"
     />
   </div>
 
   <div class="mb-3">
-    <label for="tax" class="form-label">交易稅</label>
+    <label for="tax" class="form-label">Transaction Tax</label>
     <input
       type="number"
       class="form-control"
       id="tax"
       name="tax"
-      placeholder="請輸入交易稅(e.g. 8)"
+      placeholder="Please enter transaction tax(e.g.8)"
       min="1"
     />
   </div>
 
   <div class="mb-3">
-    <label for="date" class="form-label">日期</label>
+    <label for="date" class="form-label">Date</label>
     <input type="date" class="form-control" id="date" name="date" />
   </div>
 
-  <button type="submit" class="btn btn-outline-success">提交表單</button>
+  <button type="submit" class="btn btn-outline-success">Submit</button>
 </form>
 
 <script>

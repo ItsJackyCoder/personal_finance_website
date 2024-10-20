@@ -29,18 +29,18 @@
   <div id="loginPage" class="modal-dialog"> <!--測試-->
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">歡迎👏👏👏</h5>
+        <h5 class="modal-title" id="exampleModalLabel">Welcome👏👏👏</h5>
       </div>
       <div id= "loginForm" class="modal-body">
-        歡迎來到現金與股票庫存管理系統！<br />
-        此網頁的用途是管理與追蹤現金及股票庫存的變化。<br /><br />
+        Welcome to the cash and stock warehouse management system!<br /><br />
+        The purpose of this webpage is to manage and track the changes in cash and stock storage.<br /><br />
 
         <!-- 表單開始 --> 
         <!--提交form到後端要記得寫method="POST"-->
         <form id="userCodeForm" onsubmit="return handleFormSubmit(event)" method="POST">
 
         <!-- 文字框 -->
-        <label for="userCode" class="form-label mb-3">帳號:</label>
+        <label for="userCode" class="form-label mb-3">Account:</label>
         <div class="input-group mb-3">
           <input
             id="userCodeInput"
@@ -49,12 +49,12 @@
             class="form-control"
             aria-label="Sizing example input"
             aria-describedby="inputGroup-sizing-default"
-            placeholder="請輸入10位以內的英文字母或數字"
+            placeholder="Please enter up to 10 English letters or numbers."
             required
           />
         </div>
 
-        <label for="pwd" class="form-label mb-3">密碼:</label>
+        <label for="pwd" class="form-label mb-3">Password:</label>
         <div class="input-group mb-3">
           <input
             id="pwdInput"
@@ -63,7 +63,7 @@
             class="form-control"
             aria-label="Sizing example input"
             aria-describedby="inputGroup-sizing-default"
-            placeholder="請輸入10位以內的英文字母或數字"
+            placeholder="Please enter up to 10 English letters or numbers."
             required
           />
         </div>
@@ -79,7 +79,7 @@
          class="btn btn-success me-auto"
          onclick="openRegistrationPage()" 
        >
-         註冊
+        Register
        </button>
 
         <!--不需要在按鈕上添加onclick事件,因為表單會自動調用onsubmit事件-->
@@ -87,7 +87,7 @@
           type="submit"
           class="btn btn-success"
         >
-          登入
+          Login
         </button>
       </div>
     </form>
@@ -99,12 +99,12 @@
     <div id="registrationForm" class="modal-dialog" style="display: none;"> <!--測試-->
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">註冊帳號</h5>
+          <h5 class="modal-title" id="exampleModalLabel">Register Account</h5>
         </div>
         <div class="modal-body">
 
       <form id="registerForm" onsubmit="return handleRegistration(event)" method="POST">
-        <label for="regUserCode" class="form-label mb-3">帳號:</label>
+        <label for="regUserCode" class="form-label mb-3">Account:</label>
         <div class="input-group mb-3">
           <input
             id="regUserCode"
@@ -112,12 +112,12 @@
             type="text"
             class="form-control"
             aria-label="Sizing example input"
-            placeholder="請輸入10位以內的英文字母或數字"
+            placeholder="Please enter up to 10 English letters or numbers."
             required
           />
         </div>
 
-        <label for="regPwd" class="form-label mb-3">密碼:</label>
+        <label for="regPwd" class="form-label mb-3">Password:</label>
         <div class="input-group mb-3">
           <input
             id="regPwd"
@@ -125,7 +125,7 @@
             type="text"
             class="form-control"
             aria-label="Sizing example input"
-            placeholder="請輸入10位以內的英文字母或數字"
+            placeholder="Please enter up to 10 English letters or numbers."
             required
           />
         </div>
@@ -138,14 +138,14 @@
             class="btn btn-success me-auto"
             onclick="showLoginForm()"
           >
-            返回登入
+            Return to Login
           </button>
 
           <button
             type="submit"
             class="btn btn-success"
           >
-            確認
+            Confirm
           </button>
         </div>
       </form>
@@ -157,14 +157,14 @@
 <div id="main-content"><!--虛化開始-->
 <div id="cash-info">
   <!--&#x1F4B5;是鈔票的emoji-->
-  <h3>現金庫存 💵</h3>
+  <h3>Cash Inventory 💵</h3>
   <table class="table">
     <thead class="table-success">
       <tr>
-        <th scope="col">台幣總額</th>
-        <th scope="col">美金總額</th>
-        <th scope="col">今日匯率</th>
-        <th scope="col">現金總額</th>
+        <th scope="col">Total in TWD</th>
+        <th scope="col">Total in USD</th>
+        <th scope="col">Today's Exchange Rate</th>
+        <th scope="col">Total Cash</th>
       </tr>
     </thead>
     <tbody>
@@ -177,18 +177,18 @@
     </tbody>
   </table>
 
-  <h5>現金更動紀錄</h5>
+  <h5>Cash Adjustment Record</h5>
   <!--從bootstrap那邊來的,可以去參考那邊的table的範例-->
   <table class="table">
     <thead class="table-success">
       <tr>
         <!--col:column-->
         <th scope="col" style="display: none">ID</th>
-        <th scope="col">台幣</th>
-        <th scope="col">美金</th>
-        <th scope="col">註記</th>
-        <th scope="col">時間</th>
-        <th scope="col">刪除資料</th>
+        <th scope="col">TWD</th>
+        <th scope="col">USD</th>
+        <th scope="col">Notes</th>
+        <th scope="col">Date</th>
+        <th scope="col"></th>
       </tr>
     </thead>
     <tbody>
@@ -212,7 +212,7 @@
             <!--當使用者按下「刪除此筆資料」時,data[0]這筆資料就會被到後端的伺服器-->
             <input type="hidden" name="id" value="{{data[0]}}" />
             <!--btn-primary:設定button的背景是藍色-->
-            <button class="btn btn-outline-success">刪除此筆資料</button>
+            <button class="btn btn-outline-success">Delete</button>
           </form>
         </td>
       </tr>
@@ -224,40 +224,40 @@
 <hr />
 <div id="stock-info">
   <!--&#x1F4C8;是股票的emoji-->
-  <h3>股票庫存 📈</h3>
+  <h3>Stock Inventory 📈</h3>
   <table class="table">
     <thead class="table-success">
       <tr>
-        <th scope="col">股票代號</th>
-        <th scope="col">持有股數</th>
-        <th scope="col">目前股價</th>
-        <th scope="col">目前市值</th>
-        <th scope="col">股票資產占比(%)</th>
-        <th scope="col">購買總成本(包含手續費)</th>
-        <th scope="col">平均成本</th>
-        <th scope="col">報酬率(%)</th>
-        <th scope="col">刪除資料</th>
+        <th scope="col">Stock Code</th>
+        <th scope="col">Number of Shares Held</th>
+        <th scope="col">Current Stock Price</th>
+        <th scope="col">Current Market Value</th>
+        <th scope="col">Stock Asset Proportion(%)</th>
+        <th scope="col">Total Purchase Cost(including Fees)</th>
+        <th scope="col">Average Cost</th>
+        <th scope="col">Return Rate(%)</th>
+        <th scope="col"></th>
       </tr>
     </thead>
     <tbody>
       {% for d in data["stock_info"] %}
       <tr>
         <!--這裡的d是一個dictionary-->
-        <td>{{d["stock_id"]}}</td>
-        <td>{{d["shares"]}}</td>
-        <td>{{d["current_price"]}}</td>
-        <td>{{d["total_value"]}}</td>
-        <td>{{d["value_percentage"]}}</td>
-        <td>{{d["stock_cost"]}}</td>
-        <td>{{d["average_cost"]}}</td>
-        <td>{{d["rate_of_return"]}}</td>
+        <td style="vertical-align: middle">{{d["stock_id"]}}</td>
+        <td style="vertical-align: middle">{{d["shares"]}}</td>
+        <td style="vertical-align: middle">{{d["current_price"]}}</td>
+        <td style="vertical-align: middle">{{d["total_value"]}}</td>
+        <td style="vertical-align: middle">{{d["value_percentage"]}}</td>
+        <td style="vertical-align: middle">{{d["stock_cost"]}}</td>
+        <td style="vertical-align: middle">{{d["average_cost"]}}</td>
+        <td style="vertical-align: middle">{{d["rate_of_return"]}}</td>
         <td>
           <form action="/stock-delete" method="post">
             <!--作一個沒人看到的<input> tag-->
             <!--當使用者按下「刪除此筆資料」時,data[0]這筆資料就會被到後端的伺服器-->
             <input type="hidden" name="stock_id" value="{{d['stock_id']}}" />
             <!--btn-primary:設定button的背景是藍色-->
-            <button class="btn btn-outline-success">刪除此筆資料</button>
+            <button class="btn btn-outline-success">Delete</button>
           </form>
         </td>
       </tr>
@@ -272,12 +272,12 @@
   <!--去判斷要不要顯示figure-->
   {% if data["show_pic_1"] %}
   <figure style="flex: 0 1 500px; margin: 10px">
-    <figcaption>股票庫存占比圖</figcaption>
+    <figcaption>Stock Warehouse Occupancy Chart</figcaption>
     <img style="width: 100%" src="/static/piechart.jpg" alt="股票庫存占比圖" />
   </figure>
   {% endif %} {% if data["show_pic_2"] %}
   <figure style="flex: 0 1 500px; margin: 10px">
-    <figcaption>資產比例占比圖</figcaption>
+    <figcaption>Asset Ratio Chart</figcaption>
     <img style="width: 100%" src="/static/piechart2.jpg" alt="資產比例占比圖" />
   </figure>
   {% endif %}
@@ -285,9 +285,9 @@
 
 <hr />
 <div id="footer" style="text-align: right; padding: 10px 0">
-  今日匯率資料來源:
+  Today's Exchange Rate Data Source:
   <a href="https://tw.rter.info/howto_currencyapi.php" target="_blank">
-    全球即時匯率API
+    Global Real-Time Exchange Rate API
   </a>
 </div>
 </div> <!--虛化結束-->
