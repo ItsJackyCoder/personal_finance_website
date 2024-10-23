@@ -282,8 +282,8 @@ def sumbit_userID():  # 可以接收到使用者提交出來的資料
     pwd = request.values["pwdInput"]
 
     # 測試用-->有成功抓到使用者輸入的正確資訊
-    print(userID)
-    print(pwd)
+    # print(userID)
+    # print(pwd)
 
     # 2.更新數據庫資料
     # get_db():裡面的code,如果有必要的話,會自動幫我們連接到資料庫
@@ -321,8 +321,8 @@ def register_userID():
     regPwd = request.values["regPwd"]
 
     # 測試用-->有成功抓到使用者輸入的正確資訊
-    print(regID)
-    print(regPwd)
+    # print(regID)
+    # print(regPwd)
 
     # 2.更新數據庫資料
     # get_db():裡面的code,如果有必要的話,會自動幫我們連接到資料庫
@@ -359,7 +359,10 @@ def register_userID():
 
 @ app.route("/cash")
 def cash_form():
-    return render_template("cash.html")
+    if "user_id" not in session:
+        return redirect("/")
+    else:
+        return render_template("cash.html")
 
 
 # 設定新的route來接收cash.html的表單的內容。
@@ -417,7 +420,10 @@ def cash_delete():
 
 @ app.route("/stock")
 def stock_form():
-    return render_template("stock.html")
+    if "user_id" not in session:
+        return redirect("/")
+    else:
+        return render_template("stock.html")
 
 
 @ app.route("/stock", methods=["POST"])
