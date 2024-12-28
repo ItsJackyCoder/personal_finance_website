@@ -3,10 +3,11 @@
 # request:要接收到使用者資料所需要用到的module
 # g:flask連接資料庫所需要的東西
 # redirect:可以讓使用者導回主畫面的模組
+from datetime import datetime
+import mysql.connector  # MySQL資料庫
 import os  # 為了隱藏圓餅圖的文字(如果static裡面沒有資料就不顯示文字)
 from flask import Flask, render_template, request, g, redirect, session, jsonify
-import sqlite3
-import uuid
+# import uuid
 import requests  # 為了全球即時匯率的API而使用的module
 import math
 import matplotlib.pyplot as plt
@@ -15,20 +16,34 @@ matplotlib.use("agg")  # 老師說照寫就好
 
 app = Flask(__name__)
 
-# 設置 secret_key，確保使用者的 session 是安全的
+# 設置secret_key,確保使用者的session是安全的
 app.secret_key = os.urandom(24)  # 使用隨機生成的密鑰
 
-database = "datafile.db"
+# MySQL資料庫配置
+DB_CONFIG = {
+    'host': '34.81.6.254',  # MySQL主機地址
+    'user': 'root',  # 使用者名稱
+    'password': '12345',  # 密碼
+    'database': 'finance_website_db',  # 資料庫名稱
+}
+
+# 取得目前的時間
+now = datetime.now()
+formatted_time = now.strftime("%Y-%m-%d %H:%M:%S")
 
 
-# 和flask使用sqlite3的官方文件所寫的文檔會有些不同
-# 老師覺得這麼寫比較簡便
 def get_db():
-    # hasattr():hasattribute,去查看g有沒有一個attribute是sqlite_db
-    if not hasattr(g, "sqlite_db"):
-        g.sqlite_db = sqlite3.connect(database)
+    # hasattr():hasattribute,去查看g有沒有一個attribute是mysql_db
+    if not hasattr(g, "mysql_db"):
+        # 使用mysql.connector建立MySQL連線並存到g.mysql_db
+        g.mysql_db = mysql.connector.connect(
+            host=DB_CONFIG['host'],
+            user=DB_CONFIG['user'],
+            password=DB_CONFIG['password'],
+            database=DB_CONFIG['database'],
+        )
 
-    return g.sqlite_db
+    return g.mysql_db
 
 
 @app.teardown_appcontext
@@ -40,47 +55,28 @@ def close_connection(exception):  # 這個function是被自動執行的
     # 這行是老師為了讓我們知道這個function是自動被執行才寫的
     # print("我們正在關閉sql connection......")
 
-    if hasattr(g, "sqlite_db"):
-        g.sqlite_db.close()
+    if hasattr(g, "mysql_db"):
+        g.mysql_db.close()
 
 
 @app.route('/logout', methods=['POST'])
 def logout():
-    # 刪除 session 中的 user_id
+    # 刪除session中的user_id
     session.clear()  # 清除 session 表示登出
 
     return jsonify({"message": "Logged out successfully!"})
 
 
-# 待改正
-# @app.route('/login', methods=['GET'])
-# def check_login_status():
-#     if 'user_id' in session:
-#         # 如果 session 裡有 user_id，表示已登入
-#         return jsonify({"is_logged_in": True})
-#     else:
-#         # 沒有 session，表示未登入
-#         return jsonify({"is_logged_in": False})
-
-
 @app.route("/")
 def home():
     userID = session.get('user_id')
-    # userID = request.values["userCodeInput"]
 
     # 除了要render index.html之外,也要顯示出我們現金庫存的狀況
-    conn = get_db()
-    cursor = conn.cursor()
-    result = cursor.execute(
-        "select * from cash where userID = ? order by date_info ASC", (userID,))  # 升序
-    cash_result = result.fetchall()  # a list of tuple
-
-    # 測試用
-    # print(userID)
-    # print(cash_result)
-    # print(cursor.execute("select * from cash").fetchall())
-    # print(cursor.execute("select * from stock").fetchall())
-    # print(cursor.execute("select * from users").fetchall())
+    con = get_db()
+    cursor = con.cursor()
+    cursor.execute(
+        "SELECT * FROM cash WHERE userID = %s ORDER BY date_info ASC", (userID,))  # 升序
+    cash_result = cursor.fetchall()  # a list of tuple
 
     # 計算台幣與美金的總額
     taiwanese_dollars = 0
@@ -102,12 +98,12 @@ def home():
                        currency["USDTWD"]["Exrate"])  # 因為美金換成台幣有小數點,想把它換成整數
 
     # 取得所有股票資訊
-    result2 = cursor.execute(
-        """select * from stock where userID = ?""", (userID,))
+    cursor.execute(
+        "SELECT * FROM stock WHERE userID = %s", (userID,))
 
     # a list of tuple
     # e.g. [(1, '0050', 100, 120.0, 15, 0, '2024-10-10')]
-    stock_result = result2.fetchall()
+    stock_result = cursor.fetchall()
 
     unique_stock_list = []  # a list of string
 
@@ -123,10 +119,10 @@ def home():
     stock_info = []
 
     for stock in unique_stock_list:
-        result = cursor.execute(
-            """select * from stock where stock_id = ? and userID = ?""", (stock, userID))
+        cursor.execute(
+            "SELECT * FROM stock WHERE stock_id = %s and userID = %s", (stock, userID))
 
-        result = result.fetchall()  # 這裡的result是一個list
+        result = cursor.fetchall()  # 這裡的result是一個list
 
         stock_cost = 0  # 單一股票總花費
         shares = 0  # 單一股票股數
@@ -195,7 +191,7 @@ def home():
         ax.pie(sizes, explode=e1, labels=labels,
                colors=['olivedrab', '#9ACD32',
                        '#15B01A', '#AAFF32', '#008000'],
-               textprops={"size": "16"}, autopct=None, shadow=None)
+               textprops={"size": "15"}, autopct=None, shadow=None)
 
         fig.subplots_adjust(top=1, bottom=0, right=1,
                             left=0, hspace=0, wspace=0)
@@ -230,7 +226,7 @@ def home():
         ax.pie(sizes, explode=e2, labels=labels,
                colors=['olivedrab', '#9ACD32',
                        '#15B01A', '#AAFF32', '#008000'],
-               textprops={"size": "16"}, autopct=None, shadow=None)
+               textprops={"size": "15"}, autopct=None, shadow=None)
 
         fig.subplots_adjust(top=1, bottom=0, right=1,
                             left=0, hspace=0, wspace=0)
@@ -281,17 +277,13 @@ def sumbit_userID():  # 可以接收到使用者提交出來的資料
     userID = request.values["userCodeInput"]
     pwd = request.values["pwdInput"]
 
-    # 測試用-->有成功抓到使用者輸入的正確資訊
-    # print(userID)
-    # print(pwd)
-
     # 2.更新數據庫資料
     # get_db():裡面的code,如果有必要的話,會自動幫我們連接到資料庫
     conn = get_db()
     cursor = conn.cursor()
-    result = cursor.execute("""select * from users""")
+    cursor.execute("SELECT userID, password FROM users")
 
-    users_result = result.fetchall()
+    users_result = cursor.fetchall()
     total_users = {}
 
     for data in users_result:
@@ -320,30 +312,23 @@ def register_userID():
     regID = request.values["regUserCode"]
     regPwd = request.values["regPwd"]
 
-    # 測試用-->有成功抓到使用者輸入的正確資訊
-    # print(regID)
-    # print(regPwd)
-
     # 2.更新數據庫資料
     # get_db():裡面的code,如果有必要的話,會自動幫我們連接到資料庫
     conn = get_db()
     cursor = conn.cursor()
-    result = cursor.execute("""select * from users""")
+    cursor.execute("SELECT userID, password FROM users")
 
-    users_result = result.fetchall()
+    users_result = cursor.fetchall()
     total_users = {}
 
     for data in users_result:
         name, password = data
-
         total_users[name] = password
-
-    print(total_users)
 
     # 如果沒有重複的帳號,就給註冊
     if regID not in total_users:
-        cursor.execute("""insert into users (userID, password) values (?,?)""",
-                       (regID, regPwd))
+        cursor.execute("INSERT INTO users (userID, password, created_at) VALUES (%s,%s,%s)",
+                       (regID, regPwd, formatted_time))
 
         # 儲存在session中,以讓其他的route也能調用此變數
         session['user_id'] = regID
@@ -359,10 +344,12 @@ def register_userID():
 
 @ app.route("/cash")
 def cash_form():
-    if "user_id" not in session:
+    # 作個權限控管,避免user直接輸入網址進入某個頁面
+    if "user_id" not in session:  # 如果user沒有登入,也就沒有Session,所以就導回主頁面
         return redirect("/")
     else:
-        return render_template("cash.html")
+        # 因為"cash.html"有用了data這個變數,不傳入的話會出現錯誤
+        return render_template("cash.html", data=None)
 
 
 # 設定新的route來接收cash.html的表單的內容。
@@ -371,6 +358,8 @@ def cash_form():
 @ app.route("/cash", methods=["POST"])
 def sumbit_cash():  # 可以接收到使用者提交出來的資料
     userID = session.get('user_id')
+
+    transaction_id = request.values["transaction_id"]
 
     # 1.取得使用者輸入的金額和日期資料
     taiwanese_dollars = 0
@@ -391,9 +380,13 @@ def sumbit_cash():  # 可以接收到使用者提交出來的資料
     conn = get_db()
     cursor = conn.cursor()
 
-    # transaction_id會自己去生成
-    cursor.execute("""insert into cash (taiwanese_dollars, us_dollars, note, date_info, userID) values (?, ?, ?, ?, ?)""",
-                   (taiwanese_dollars, us_dollars, note, date, userID))
+    if transaction_id != "":  # 如果是非空字串,代表是修改資料
+        cursor.execute("UPDATE cash SET taiwanese_dollars=%s, us_dollars=%s, note=%s, date_info=%s WHERE transaction_id=%s",
+                       (taiwanese_dollars, us_dollars, note, date, transaction_id))
+    else:
+        # transaction_id會自己去生成
+        cursor.execute("INSERT INTO cash (taiwanese_dollars, us_dollars, note, date_info, userID) VALUES (%s, %s, %s, %s, %s)",
+                       (taiwanese_dollars, us_dollars, note, date, userID))
 
     conn.commit()
 
@@ -410,7 +403,7 @@ def cash_delete():
     conn = get_db()
     cursor = conn.cursor()
     cursor.execute(
-        """delete from cash where transaction_id = ? and userID = ?""", (transaction_id, userID))
+        "DELETE FROM cash WHERE transaction_id = %s and userID = %s", (transaction_id, userID))
 
     conn.commit()
 
@@ -418,12 +411,30 @@ def cash_delete():
     return redirect("/")
 
 
+@ app.route("/cash-update", methods=["POST"])
+def cash_update():
+    transaction_id = request.values["updateId"]
+    userID = session.get('user_id')
+
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT * FROM cash WHERE transaction_id = %s and userID = %s", (transaction_id, userID))
+
+    # 如果用fetchall()會是以陣列形式出現 e.g.[(XXX,XXX)]
+    data = cursor.fetchone()  # output:(XXX,XXX)
+
+    return render_template("/cash.html", data=data)
+
+
 @ app.route("/stock")
 def stock_form():
-    if "user_id" not in session:
+    # 作個權限控管,避免user直接輸入網址進入某個頁面
+    if "user_id" not in session:  # 如果user沒有登入,也就沒有Session,所以就導回主頁面
         return redirect("/")
     else:
-        return render_template("stock.html")
+        # 因為"stock.html"有用了data這個變數,不傳入的話會出現錯誤
+        return render_template("stock.html", data=None)
 
 
 @ app.route("/stock", methods=["POST"])
@@ -472,7 +483,7 @@ def submit_stock():
     cursor = conn.cursor()
 
     # transaction_id可以不用管它
-    cursor.execute("""insert into stock (stock_id, stock_num, stock_price, processing_fee, tax, date_info, userID) values (?, ?, ?, ?, ?, ?, ?)""",
+    cursor.execute("INSERT INTO stock (stock_id, stock_num, stock_price, processing_fee, tax, date_info, userID) VALUES (%s, %s, %s, %s, %s, %s, %s)",
                    (stock_id, stock_num, stock_price, processing_fee, tax, date, userID))
 
     conn.commit()
@@ -490,12 +501,83 @@ def stock_delete():
     conn = get_db()
     cursor = conn.cursor()
     cursor.execute(
-        """delete from stock where stock_id = ? and userID = ?""", (stock_id, userID))
+        "DELETE FROM stock WHERE stock_id = %s and userID = %s", (stock_id, userID))
 
     conn.commit()
 
     # 當使用者刪除某一筆資料後,把頁面重新導回到首頁
     return redirect("/")
+
+
+@ app.route("/stock-update", methods=["POST"])
+def stock_update():
+    stockID = request.form["updateStockId"]
+    userID = session.get('user_id')
+
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT SUM(stock_num) FROM stock WHERE stock_id=%s and userId=%s", (stockID, userID))
+
+    stockNumTotal = cursor.fetchone()[0]
+
+    return render_template("/stock-sell.html", stockID=stockID, stockNumTotal=stockNumTotal)
+
+
+@ app.route("/stock-sell", methods=["POST"])
+def stock_sell():
+    stock_id = request.form["stockSellId"]
+    stock_num = int(request.form["stock-num"])
+    userID = session.get('user_id')
+
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT stock_num FROM stock WHERE stock_id=%s and userId=%s ORDER BY date_info ASC", (stock_id, userID))
+
+    data = cursor.fetchall()  # output:[(1000,), (1500,), (3000,)]
+
+    for num in data:
+        if stock_num >= num[0]:  # 假如stock_num＝3500
+            cursor.execute(
+                "SELECT MIN(date_info) FROM stock WHERE stock_id = %s", (stock_id,))
+            earliest_date = cursor.fetchone()[0]
+
+            cursor.execute(
+                "DELETE FROM stock WHERE stock_id=%s and date_info=%s", (stock_id, earliest_date))
+
+            conn.commit()
+            stock_num -= num[0]
+        else:
+            cursor.execute(
+                "SELECT MIN(date_info) FROM stock WHERE stock_id = %s", (stock_id,))
+            earliest_date = cursor.fetchone()[0]
+
+            cursor.execute(
+                "UPDATE stock SET stock_num=%s WHERE stock_id=%s and date_info=%s", (num[0]-stock_num, stock_id, earliest_date))
+
+            conn.commit()
+
+            break
+
+    return redirect("/")
+
+
+@ app.route("/stock-statements", methods=["POST"])  # 股票明細待改!
+def stock_statements():
+    stockID = request.form["statementsId"]
+    userID = session.get('user_id')
+
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT * FROM stock WHERE stock_id = %s and userID = %s ORDER BY date_info DESC", (stockID, userID))
+
+    # 如果用fetchall()會是以陣列形式出現 e.g.[(XXX,XXX)]
+    # output:[(4, '6591', 1000, 25.0, 0, 0, datetime.date(2024, 12, 26), 'Jacky'), (5, '6591', 1500, 25.6, 0, 0, datetime.date(2024, 12, 27), 'Jacky')]
+    data = cursor.fetchall()
+
+    return render_template("/stock-statement.html", data=data)
 
 
 if __name__ == "__main__":

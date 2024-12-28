@@ -1,0 +1,47 @@
+{% extends "base.html" %} {% block content%}
+<div
+  class="modal fade"
+  id="introModal"
+  tabindex="-1"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+  data-bs-backdrop="static"
+  data-bs-keyboard="false"
+  style="display: none"
+></div>
+
+<div id="main-content">
+  <hr />
+  <div id="stock-info">
+    <!--&#x1F4C8;是股票的emoji-->
+    <h3>Stock Statement 📝</h3>
+    <table class="table" style="text-align: center">
+      <thead class="table-success">
+        <tr>
+          <th scope="col" style="display: none">ID</th>
+          <th scope="col">Stock Code</th>
+          <th scope="col">Number of Shares Held</th>
+          <th scope="col">Stock Price</th>
+          <th scope="col">Fees</th>
+          <th scope="col">Tax</th>
+          <th scope="col">Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for d in data %}
+        <tr>
+          <!--style="vertical-align: middle":垂直置中-->
+          <td style="vertical-align: middle; display: none">{{d[0]}}</td>
+          <td style="vertical-align: middle">{{d[1]}}</td>
+          <td style="vertical-align: middle">{{d[2]}}</td>
+          <td style="vertical-align: middle">{{d[3]}}</td>
+          <td style="vertical-align: middle">{{d[4]}}</td>
+          <td style="vertical-align: middle">{{d[5]}}</td>
+          <td style="vertical-align: middle">{{d[6]}}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

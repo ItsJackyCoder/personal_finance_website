@@ -50,6 +50,8 @@
             aria-label="Sizing example input"
             aria-describedby="inputGroup-sizing-default"
             placeholder="Please enter up to 10 English letters or numbers."
+            maxlength="10"
+            oninput="filterInput(this)"
             required
           />
         </div>
@@ -59,11 +61,13 @@
           <input
             id="pwdInput"
             name="pwdInput"
-            type="text"
+            type="password"
             class="form-control"
             aria-label="Sizing example input"
             aria-describedby="inputGroup-sizing-default"
             placeholder="Please enter up to 10 English letters or numbers."
+            maxlength="10"
+            oninput="filterInput(this)"
             required
           />
         </div>
@@ -113,6 +117,8 @@
             class="form-control"
             aria-label="Sizing example input"
             placeholder="Please enter up to 10 English letters or numbers."
+            maxlength="10"
+            oninput="filterInput(this)"
             required
           />
         </div>
@@ -122,10 +128,12 @@
           <input
             id="regPwd"
             name="regPwd"
-            type="text"
+            type="password"
             class="form-control"
             aria-label="Sizing example input"
             placeholder="Please enter up to 10 English letters or numbers."
+            maxlength="10"
+            oninput="filterInput(this)"
             required
           />
         </div>
@@ -158,7 +166,7 @@
 <div id="cash-info">
   <!--&#x1F4B5;是鈔票的emoji-->
   <h3>Cash Inventory 💵</h3>
-  <table class="table">
+  <table class="table" style="text-align: center;">
     <thead class="table-success">
       <tr>
         <th scope="col">Total in TWD</th>
@@ -179,7 +187,7 @@
 
   <h5>Cash Adjustment Record</h5>
   <!--從bootstrap那邊來的,可以去參考那邊的table的範例-->
-  <table class="table">
+  <table class="table" style="text-align: center;"> 
     <thead class="table-success">
       <tr>
         <!--col:column-->
@@ -203,18 +211,24 @@
         <td style="vertical-align: middle">{{data[2]}}</td>
         <td style="vertical-align: middle">{{data[3]}}</td>
         <td style="vertical-align: middle">{{data[4]}}</td>
-        <td>
+        <td style="width:20%">
           <!--這裡不能只做一個button,而是要作一個form,這是因為我們要透過這個form,
           當使用者按下「刪除此筆資料」這個button之後,它會寄送一個HTTP的POST request
           到我們的index.py的伺服器,它寄送request之後,我們的伺服器再來處理這個request-->
-          <form action="/cash-delete" method="post">
+          <form action="/cash-delete" method="post" style="display: inline; margin-right: 5px;">
             <!--作一個沒人看到的<input> tag-->
             <!--當使用者按下「刪除此筆資料」時,data[0]這筆資料就會被到後端的伺服器-->
             <input type="hidden" name="id" value="{{data[0]}}" />
             <!--btn-primary:設定button的背景是藍色-->
             <button class="btn btn-outline-success">Delete</button>
           </form>
-        </td>
+          
+          <!--更新按鈕-->
+          <form action="/cash-update" method="post" style="display: inline">
+            <input type="hidden" name="updateId" value="{{data[0]}}" />
+            <button class="btn btn-outline-success">Update</button>
+          </form>
+        </td>        
       </tr>
       {% endfor %}
     </tbody>
@@ -225,7 +239,7 @@
 <div id="stock-info">
   <!--&#x1F4C8;是股票的emoji-->
   <h3>Stock Inventory 📈</h3>
-  <table class="table">
+  <table class="table" style="text-align: center;">
     <thead class="table-success">
       <tr>
         <th scope="col">Stock Code</th>
@@ -250,7 +264,9 @@
         <td style="vertical-align: middle">{{d["value_percentage"]}}</td>
         <td style="vertical-align: middle">{{d["stock_cost"]}}</td>
         <td style="vertical-align: middle">{{d["average_cost"]}}</td>
-        <td style="vertical-align: middle">{{d["rate_of_return"]}}</td>
+        <td style="vertical-align: middle" class="{% if d['rate_of_return'] < 0 %} text-success{% else %} text-danger{% endif %}">
+          {{ d["rate_of_return"] }}
+        </td>
         <td>
           <form action="/stock-delete" method="post">
             <!--作一個沒人看到的<input> tag-->
@@ -258,6 +274,18 @@
             <input type="hidden" name="stock_id" value="{{d['stock_id']}}" />
             <!--btn-primary:設定button的背景是藍色-->
             <button class="btn btn-outline-success">Delete</button>
+          </form>
+
+          <!--更新按鈕-->
+          <form action="/stock-update" method="post" style="margin-top: 10px">
+            <input type="hidden" name="updateStockId" value="{{d['stock_id']}}" />
+            <button class="btn btn-outline-success">Update</button>
+          </form>
+
+           <!--明細按鈕-->
+           <form action="/stock-statements" method="post" style="margin-top: 10px">
+            <input type="hidden" name="statementsId" value="{{d['stock_id']}}" />
+            <button class="btn btn-outline-success">Details</button>
           </form>
         </td>
       </tr>
@@ -276,7 +304,7 @@
     <img style="width: 100%" src="/static/piechart.jpg" alt="股票庫存占比圖" />
   </figure>
   {% endif %} {% if data["show_pic_2"] %}
-  <figure style="flex: 0 1 500px; margin: 10px">
+  <figure style="flex: 0 1 500px; margin: 15px">
     <figcaption>Asset Ratio Chart</figcaption>
     <img style="width: 100%" src="/static/piechart2.jpg" alt="資產比例占比圖" />
   </figure>
@@ -316,7 +344,7 @@
     }
 
 };
-
+  //登入頁面的「確認」button
   function handleFormSubmit(event) {
     event.preventDefault(); // 防止表單默認提交
 
@@ -341,9 +369,19 @@
             var myModal = bootstrap.Modal.getInstance(document.getElementById("introModal"));
             myModal.hide();
 
+            // 保持背景模糊,立即刷新頁面
+            setTimeout(() => {
+                location.reload(); // 立即刷新頁面,展示最新資料
+             }, 0);
+
+            // 在3秒後移除模糊效果
+            setTimeout(() => {
+                document.getElementById("main-content").classList.remove("blurred");
+            }, 3000); // 延遲1.5秒移除模糊效果
+
             //移除需化背景
-            myModal._element.addEventListener('hidden.bs.modal', function () {
-            document.getElementById("main-content").classList.remove("blurred");});
+            //myModal._element.addEventListener('hidden.bs.modal', function () {
+            //document.getElementById("main-content").classList.remove("blurred");});
             
             location.reload();
         } else {
@@ -389,9 +427,19 @@
             var myModal = bootstrap.Modal.getInstance(document.getElementById("introModal"));
             myModal.hide();
 
-            //移除需化背景
-            myModal._element.addEventListener('hidden.bs.modal', function () {
-            document.getElementById("main-content").classList.remove("blurred");});
+            // 保持背景模糊,立即刷新頁面
+            setTimeout(() => {
+                location.reload(); // 立即刷新頁面,展示最新資料
+             }, 0);
+
+            // 在3秒後移除模糊效果
+            setTimeout(() => {
+                document.getElementById("main-content").classList.remove("blurred");
+            }, 3000); // 延遲3秒移除模糊效果
+
+            //移除需化背景(原始code)
+            // myModal._element.addEventListener('hidden.bs.modal', function () {
+            // document.getElementById("main-content").classList.remove("blurred");});
             
             location.reload();
         } else {
@@ -428,65 +476,13 @@
       document.getElementById('registrationForm').style.display = 'none';
       document.getElementById('exampleModalLabel').textContent = "歡迎👏👏👏";
     }
-
-
-  // 當表單提交時的事件處理函數
-// function handleFormSubmit(event) {
-//   event.preventDefault(); // 阻止表單的默認提交行為
-
-//   var userCodeInput = document.getElementById("userCodeInput").value;
-//   var inputError = document.getElementById("inputError");
-
-//   // 檢查是否有輸入代號
-//   if (!userCodeInput.trim()) {
-//     // 如果沒有輸入，顯示錯誤提示並保持彈出視窗
-//     inputError.style.display = "block";
-//   } else {
-//     // 如果有輸入，隱藏錯誤提示並繼續處理邏輯
-//     inputError.style.display = "none";
-
-//     // 使用 fetch 將資料發送到伺服器
-//     fetch("/submit_code", {
-//       method: "POST",
-//       headers: {
-//         "Content-Type": "application/json",
-//       },
-//       body: JSON.stringify({ code: userCodeInput }), // 將使用者的輸入作為請求體
-//     })
-//       .then((response) => {
-//         if (response.ok) {
-//           // 隱藏彈出視窗
-//           var myModal = bootstrap.Modal.getInstance(
-//             document.getElementById("introModal")
-//           );
-//           myModal.hide(); // 隱藏彈出視窗
-
-//           // 重新載入頁面
-//           location.reload();
-//         } else {
-//           // 這裡可以處理伺服器返回的錯誤，例如顯示提示
-//           console.error("伺服器錯誤");
-//         }
-//       })
-//       .catch((error) => {
-//         console.error("網路錯誤:", error);
-//       });
-//   }
-// }
 </script>
 
-<!-- 引入 Bootstrap 和 JavaScript -->
-<!--彈跳視窗-->
-<!-- <script>
-  window.onload = function () {
-    // 檢查 sessionStorage 中是否有"modalShown"標記
-    if (!sessionStorage.getItem("modalShown")) {
-      var myModal = new bootstrap.Modal(document.getElementById("introModal"));
-      myModal.show();
-
-      // 顯示過後將標記儲存到 sessionStorage
-      sessionStorage.setItem("modalShown", "true");
-    }
-  };
-</script> -->
+<script>
+  function filterInput(input) {
+    // 使用正則表達式匹配允許的字符(英文字母、數字和特殊符號)
+    input.value = input.value.replace(/[^A-Za-z0-9!@#$%^&*()_+={}\[\]:;\"'<>,.?/\\|`~\-]/g, ''); 
+    // 上面的正則表達式會移除任何不在允許範圍內的字符
+  }
+</script>
 {% endblock %}
