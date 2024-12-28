@@ -19,6 +19,7 @@
       name="taiwanese-dollars"
       value="{{ data[1] | default('') }}"
       placeholder="Please enter TWD amount(e.g.10000)"
+      maxlength="10"
     />
   </div>
 
@@ -34,6 +35,7 @@
       name="us-dollars"
       value="{{ data[2] | default('') }}"
       placeholder="Please enter USD amount(e.g.500)"
+      maxlength="8"
     />
   </div>
 
@@ -47,6 +49,7 @@
       name="note"
       value="{{ data[3] | default('') }}"
       placeholder="Please enter text(within 100 characters)"
+      maxlength="100"
     />
   </div>
 
