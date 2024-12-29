@@ -61,10 +61,16 @@
             {% if session.get('user_id') %}
             <span
               class="navbar-text me-3 text-decoration-underline"
-              style="color: black"
+              style="color: #333333; background-color: #ffe4b5"
             >
               Welcome:
-              <span id="username" style="font-size: 1.5rem; color: black"
+              <span
+                id="username"
+                style="
+                  font-size: 1.5rem;
+                  color: #333333;
+                  background-color: #ffe4b5;
+                "
                 >{{ session['user_id'] }}!</span
               >
             </span>
