@@ -12,7 +12,7 @@ import requests  # 為了全球即時匯率的API而使用的module
 import math
 import matplotlib.pyplot as plt
 import matplotlib
-matplotlib.use("agg")  # 老師說照寫就好
+matplotlib.use("agg")  # 照寫就好
 
 app = Flask(__name__)
 
@@ -52,9 +52,6 @@ def get_db():
 # e.g.按「重新整理」,也就是重新送了一個HTTP request到我們的伺服器,
 # 當我們伺服器處理完這個HTTP request之後,就會執行以下的close_connection()
 def close_connection(exception):  # 這個function是被自動執行的
-    # 這行是老師為了讓我們知道這個function是自動被執行才寫的
-    # print("我們正在關閉sql connection......")
-
     if hasattr(g, "mysql_db"):
         g.mysql_db.close()
 
@@ -133,7 +130,7 @@ def home():
             # d[2]:股數, d[3]:價格, d[4]:手續費, d[5]:稅
             stock_cost += d[2] * d[3] + d[4] + d[5]
 
-        # 證交所的API(老師說錄影當下時,它們的documentation寫得非常差)
+        # 證交所的API
         # 取得目前股價
         # 這是要發HTTP request到的地方
         url = "https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&stockNo=" + stock
@@ -151,7 +148,7 @@ def home():
             price_array[len(price_array)-1][6].replace(",", ""))  # 我自己補上的,因為float()無法處理包含逗號的數字
 
         # 單一股票總市值
-        # 老師把它換成一個整數
+        # 把它換成一個整數
         total_value = round(current_price * shares)  # 或是int():直接截斷小數位數
         total_stock_value += total_value
 
@@ -162,8 +159,6 @@ def home():
         # 因為index.html的報酬率是用百分比呈現的,所以要*100
         rate_of_return = round((total_value - stock_cost)
                                * 100 / stock_cost, 2)
-
-        # stock_count += 1
 
         # 把上面所有算的單一個股的資訊把它存進stock_info裡面
         stock_info.append({"stock_id": stock, "stock_cost": stock_cost, "total_value": total_value,
@@ -261,7 +256,7 @@ def home():
             pass
 
     # 製作一個物件,裡面是我們所有要把它帶到index.html裡面,去填入的數值
-    # os.path.exists()是一個Boolean,查看此檔案或資料夾是否存在(有教過)
+    # os.path.exists()是一個Boolean,查看此檔案或資料夾是否存在
     data = {"show_pic_1": os.path.exists("static/piechart.jpg"), "show_pic_2": os.path.exists("static/piechart2.jpg"), "total": total,
             "currency": currency["USDTWD"]["Exrate"], "ud": us_dollars, "td": taiwanese_dollars, "cash_result": cash_result, "stock_info": stock_info}
 
@@ -563,7 +558,7 @@ def stock_sell():
     return redirect("/")
 
 
-@ app.route("/stock-statements", methods=["POST"])  # 股票明細待改!
+@ app.route("/stock-statements", methods=["POST"])
 def stock_statements():
     stockID = request.form["statementsId"]
     userID = session.get('user_id')
