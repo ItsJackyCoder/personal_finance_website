@@ -31,20 +31,20 @@ This website is designed to display the user's inventory of Taiwanese currency, 
     
     #您可以註冊一個新帳號體驗，
     或是直接使用此處提供的帳號及密碼登入。
-
-* 首頁
+    
+#### Home Page:
 ![](static/images/homepage.png)
 
-* Cash Inventory
+#### Cash Inventory:
 ![](static/images/cash_inventory.png)
 
-* Stock Inventory
+#### Stock Inventory:
 ![](static/images/stock_inventory.png)
 
-* Cash Record
+#### Cash Record:
 ![](static/images/cash_record.png)
 
-* Stock Record
+#### Stock Record:
 ![](static/images/stock_record.png)
 
 
