@@ -1,21 +1,22 @@
 Personal Finance Website
 ===
 
-網站:https://personal-finance-website.onrender.com/
+[前往網站](https://personal-finance-website.onrender.com/)
 --
+
+用途
+---
+The purpose of this website is to manage and track the changes in cash and stock storage.
 
 使用的程式語言
 ---
 
 * 後端:Python3
 * 前端:JavaScript, HTML
+* 框架: Bootstrap, Flask
 * 資料庫:MySQL
-* 雲端服務:GCP, Render
-
-背景
----
-
-
+* 雲端服務: Google Cloud Platform(GCP), Render
+* API:[Global Real-Time Exchange Rate API](https://tw.rter.info/howto_currencyapi.php)
 
 使用者介面
 ---
