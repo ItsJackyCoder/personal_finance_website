@@ -1,4 +1,4 @@
-Personal Finance Website
+:moneybag: Personal Finance Website
 ===
 
 [前往網站](https://personal-finance-website.onrender.com/)
@@ -20,14 +20,14 @@ This website is designed to display the user's inventory of Taiwanese currency, 
 * 後端:Python3
 * 前端:JavaScript, HTML
 * 框架: Bootstrap, Flask
-* 資料庫:MySQL
+* 資料庫:MySQL(測試時,使用了SQLite3)
 * 雲端服務: Google Cloud Platform(GCP), Render
 * API:[Global Real-Time Exchange Rate API](https://tw.rter.info/howto_currencyapi.php)
 
 使用者介面
 ---
-    account:Jacky 
-    password:12345 
+    Account:Jacky 
+    Password:12345 
     
     #您可以註冊一個新帳號體驗，
     或是直接使用此處提供的帳號及密碼登入。
