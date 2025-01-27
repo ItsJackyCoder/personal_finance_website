@@ -4,7 +4,7 @@ Personal Finance Website
 [前往網站](https://personal-finance-website.onrender.com/)
 --
 
-用途
+Usage
 ---
 This website is designed to display the user's inventory of Taiwanese currency, US dollars, and Taiwanese stocks. The stock information reflects the latest closing prices from the Taiwan Stock Exchange on the current trading day.
 
@@ -26,8 +26,8 @@ This website is designed to display the user's inventory of Taiwanese currency, 
 
 使用者介面
 ---
-    帳號:Jacky 
-    密碼:12345 
+    account:Jacky 
+    password:12345 
     
     #您可以註冊一個新帳號體驗，
     或是直接使用此處提供的帳號及密碼登入。
