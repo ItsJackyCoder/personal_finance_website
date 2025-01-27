@@ -17,11 +17,11 @@ This website is designed to display the user's inventory of Taiwanese currency, 
 使用的程式語言
 ---
 
-* 後端:Python3
-* 前端:JavaScript, HTML
-* 框架: Bootstrap, Flask
-* 資料庫:MySQL(測試時,使用了SQLite3)
-* 雲端服務: Google Cloud Platform(GCP), Render
+* 後端:`Python3`
+* 前端:`JavaScript`, `HTML`
+* 框架: `Bootstrap`, `Flask`
+* 資料庫:`MySQL`(測試時,使用了`SQLite3`)
+* 雲端服務: `Google Cloud Platform(GCP)`, `Render`
 * API:[Global Real-Time Exchange Rate API](https://tw.rter.info/howto_currencyapi.php)
 
 使用者介面
