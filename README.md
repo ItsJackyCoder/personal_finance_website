@@ -12,9 +12,18 @@ Personal Finance Website
 * 資料庫:MySQL
 * 雲端服務:GCP, Render
 
+背景
+---
+
+
+
 使用者介面
 ---
-    帳號:Jacky 密碼:12345 #你可以註冊一個帳號體驗，或是直接使用此處提供的帳號及密碼登入
+    帳號:Jacky 
+    密碼:12345 
+    
+    #您可以註冊一個新帳號體驗，
+    或是直接使用此處提供的帳號及密碼登入。
 
 * 首頁
 ![](static/images/homepage.png)
