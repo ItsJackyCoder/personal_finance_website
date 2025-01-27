@@ -6,7 +6,13 @@ Personal Finance Website
 
 用途
 ---
-The purpose of this website is to manage and track the changes in cash and stock storage.
+This website is designed to display the user's inventory of Taiwanese currency, US dollars, and Taiwanese stocks. The stock information reflects the latest closing prices from the Taiwan Stock Exchange on the current trading day.
+
+    備註:
+    Since the free version of Render is being used, the server automatically enters a dormant state 
+    after 15 minutes of inactivity. As a result, there may be a delay in loading the screen.        
+    We appreciate your understanding.
+
 
 使用的程式語言
 ---
