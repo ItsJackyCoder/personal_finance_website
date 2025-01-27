@@ -1,4 +1,15 @@
-The development of this website is based on Python and Flask, two powerful tools that allow me to efficiently handle backend logic. For the frontend, I used JavaScript and HTML to enable dynamic interactions and page rendering. The website’s data is stored in a MySQL database, which is deployed on Google Cloud Platform (GCP)’s Cloud SQL service, ensuring the stability and scalability of the data. To provide the best user experience, I chose Bootstrap to quickly build a responsive webpage, ensuring that the website displays smoothly on various devices. In addition, the website integrates a real-time stock price API, providing users with the ability to record stock prices. Finally, the website is deployed on the Render cloud platform, enabling convenient cloud-based operation and management.
+Personal Finance Website
+===
 
-The purpose of this website is to manage and track the changes in cash and stock storage.
+網站:https://personal-finance-website.onrender.com/
+--
+
+使用的程式語言
+---
+
+* 後端:Python3
+* 前端:JavaScript, HTML
+* 資料庫:MySQL
+* 雲端服務:GCP, Render
+
 
