@@ -18,7 +18,7 @@ Technology Stack
 ---
 
 * Backend:`Python3`
-* Frontend:`JavaScript`, `HTML`
+* Frontend:`JavaScript`, `HTML`, `CSS`
 * Frameworks: `Bootstrap`, `Flask`
 * Database:`MySQL`(Used `SQLite3` for testing)
 * Cloud Services: `Google Cloud Platform(GCP)`, `Render`
