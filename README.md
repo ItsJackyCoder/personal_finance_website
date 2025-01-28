@@ -1,27 +1,27 @@
 :moneybag: Personal Finance Website
 ===
 
-[前往網站](https://personal-finance-website.onrender.com/)
+[Go to Website](https://personal-finance-website.onrender.com/)
 --
 
 Usage
 ---
 This website is designed to display the user's inventory of Taiwanese currency, US dollars, and Taiwanese stocks. The stock information reflects the latest closing prices from the Taiwan Stock Exchange on the current trading day.
 
-    備註:
+    Note:
     Since the free version of Render is being used, the server automatically enters a dormant state 
     after 15 minutes of inactivity. As a result, there may be a delay in loading the screen.        
     We appreciate your understanding.
 
 
-使用的程式語言
+Technology Stack
 ---
 
-* 後端:`Python3`
-* 前端:`JavaScript`, `HTML`
-* 框架: `Bootstrap`, `Flask`
-* 資料庫:`MySQL`(測試時,使用了`SQLite3`)
-* 雲端服務: `Google Cloud Platform(GCP)`, `Render`
+* Backend:`Python3`
+* Frontend:`JavaScript`, `HTML`
+* Frameworks: `Bootstrap`, `Flask`
+* Database:`MySQL`(Used `SQLite3` for testing)
+* Cloud Services: `Google Cloud Platform(GCP)`, `Render`
 * API:[Global Real-Time Exchange Rate API](https://tw.rter.info/howto_currencyapi.php)
 
 使用者介面
