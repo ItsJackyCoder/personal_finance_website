@@ -29,7 +29,8 @@ User Interface
     Account:Jacky 
     Password:12345 
     
-    #You can register a new account to try it out, 
+    Note:
+    You can register a new account to try it out, 
     or log in directly using the provided account and password.
     
 #### Home Page:
