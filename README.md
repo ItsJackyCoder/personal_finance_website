@@ -24,13 +24,13 @@ Technology Stack
 * Cloud Services: `Google Cloud Platform(GCP)`, `Render`
 * API:[Global Real-Time Exchange Rate API](https://tw.rter.info/howto_currencyapi.php)
 
-使用者介面
+User Interface
 ---
     Account:Jacky 
     Password:12345 
     
-    #您可以註冊一個新帳號體驗，
-    或是直接使用此處提供的帳號及密碼登入。
+    #You can register a new account to try it out, 
+    or log in directly using the provided account and password.
     
 #### Home Page:
 ![](static/images/homepage.png)
