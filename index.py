@@ -21,7 +21,7 @@ app.secret_key = os.urandom(24)  # 使用隨機生成的密鑰
 
 # MySQL資料庫配置
 DB_CONFIG = {
-    'host': '34.22.88.238',  # MySQL主機地址
+    'host': '34.80.72.244',  # MySQL主機地址
     'user': 'root',  # 使用者名稱
     'password': '12345',  # 密碼
     'database': 'finance_website_db',  # 資料庫名稱
@@ -265,7 +265,7 @@ def home():
     return render_template("index.html", data=data)
 
 
-@ app.route("/", methods=["POST"])
+@app.route("/", methods=["POST"])
 def sumbit_userID():  # 可以接收到使用者提交出來的資料
     # 1.取得使用者輸入的金額和日期資料
     # 這些request.values的key就是cash.html裡的<input> tag裡的name所設定的值
@@ -302,7 +302,7 @@ def sumbit_userID():  # 可以接收到使用者提交出來的資料
         return jsonify({"status": "error", "message": "Account not found!!!"})
 
 
-@ app.route("/register", methods=["POST"])
+@app.route("/register", methods=["POST"])
 def register_userID():
     regID = request.values["regUserCode"]
     regPwd = request.values["regPwd"]
@@ -337,7 +337,7 @@ def register_userID():
         return jsonify({"status": "error", "message": "Account is already in use!!!"})
 
 
-@ app.route("/cash")
+@app.route("/cash")
 def cash_form():
     # 作個權限控管,避免user直接輸入網址進入某個頁面
     if "user_id" not in session:  # 如果user沒有登入,也就沒有Session,所以就導回主頁面
@@ -350,7 +350,7 @@ def cash_form():
 # 設定新的route來接收cash.html的表單的內容。
 # POST methods:在HTTP協議中有說,你如果要對你的伺服器去提交資料的話,
 # 這時候就可以使用這個POST methods
-@ app.route("/cash", methods=["POST"])
+@app.route("/cash", methods=["POST"])
 def sumbit_cash():  # 可以接收到使用者提交出來的資料
     userID = session.get('user_id')
 
@@ -389,7 +389,7 @@ def sumbit_cash():  # 可以接收到使用者提交出來的資料
     return redirect("/")
 
 
-@ app.route("/cash-delete", methods=["POST"])
+@app.route("/cash-delete", methods=["POST"])
 def cash_delete():
     # request.values["id"]必須得跟index.html第50行看不見<input> tag的name的值一致
     transaction_id = request.values["id"]
@@ -406,7 +406,7 @@ def cash_delete():
     return redirect("/")
 
 
-@ app.route("/cash-update", methods=["POST"])
+@app.route("/cash-update", methods=["POST"])
 def cash_update():
     transaction_id = request.values["updateId"]
     userID = session.get('user_id')
@@ -422,7 +422,7 @@ def cash_update():
     return render_template("/cash.html", data=data)
 
 
-@ app.route("/stock")
+@app.route("/stock")
 def stock_form():
     # 作個權限控管,避免user直接輸入網址進入某個頁面
     if "user_id" not in session:  # 如果user沒有登入,也就沒有Session,所以就導回主頁面
@@ -432,7 +432,7 @@ def stock_form():
         return render_template("stock.html", data=None)
 
 
-@ app.route("/stock", methods=["POST"])
+@app.route("/stock", methods=["POST"])
 def submit_stock():
     userID = session.get('user_id')
 
@@ -487,7 +487,7 @@ def submit_stock():
     return redirect("/")
 
 
-@ app.route("/stock-delete", methods=["POST"])
+@app.route("/stock-delete", methods=["POST"])
 def stock_delete():
     # request.values["id"]必須得跟index.html第50行看不見<input> tag的name的值一致
     stock_id = request.values["stock_id"]
@@ -504,7 +504,7 @@ def stock_delete():
     return redirect("/")
 
 
-@ app.route("/stock-update", methods=["POST"])
+@app.route("/stock-update", methods=["POST"])
 def stock_update():
     stockID = request.form["updateStockId"]
     userID = session.get('user_id')
@@ -519,7 +519,7 @@ def stock_update():
     return render_template("/stock-sell.html", stockID=stockID, stockNumTotal=stockNumTotal)
 
 
-@ app.route("/stock-sell", methods=["POST"])
+@app.route("/stock-sell", methods=["POST"])
 def stock_sell():
     stock_id = request.form["stockSellId"]
     stock_num = int(request.form["stock-num"])
@@ -558,7 +558,7 @@ def stock_sell():
     return redirect("/")
 
 
-@ app.route("/stock-statements", methods=["POST"])
+@app.route("/stock-statements", methods=["POST"])
 def stock_statements():
     stockID = request.form["statementsId"]
     userID = session.get('user_id')
