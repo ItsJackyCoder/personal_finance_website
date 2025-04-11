@@ -3,6 +3,7 @@
 # request:要接收到使用者資料所需要用到的module
 # g:flask連接資料庫所需要的東西
 # redirect:可以讓使用者導回主畫面的模組
+from mysql.connector import pooling  # 連線池
 from datetime import datetime
 import mysql.connector  # MySQL資料庫
 import os  # 為了隱藏圓餅圖的文字(如果static裡面沒有資料就不顯示文字)
@@ -27,33 +28,53 @@ DB_CONFIG = {
     'database': 'finance_website_db',  # 資料庫名稱
 }
 
+mysql_pool = mysql.connector.pooling.MySQLConnectionPool(
+    pool_name="mysql_pool",
+    pool_size=8,
+    **DB_CONFIG
+)
+
 # 取得目前的時間
 now = datetime.now()
 formatted_time = now.strftime("%Y-%m-%d %H:%M:%S")
 
 
+# def get_db():
+#     # hasattr():hasattribute,去查看g有沒有一個attribute是mysql_db
+#     if not hasattr(g, "mysql_db"):
+#         # 使用mysql.connector建立MySQL連線並存到g.mysql_db
+#         g.mysql_db = mysql.connector.connect(
+#             host=DB_CONFIG['host'],
+#             user=DB_CONFIG['user'],
+#             password=DB_CONFIG['password'],
+#             database=DB_CONFIG['database'],
+#         )
+
+#     return g.mysql_db
+
 def get_db():
-    # hasattr():hasattribute,去查看g有沒有一個attribute是mysql_db
     if not hasattr(g, "mysql_db"):
-        # 使用mysql.connector建立MySQL連線並存到g.mysql_db
-        g.mysql_db = mysql.connector.connect(
-            host=DB_CONFIG['host'],
-            user=DB_CONFIG['user'],
-            password=DB_CONFIG['password'],
-            database=DB_CONFIG['database'],
-        )
+        g.mysql_db = mysql_pool.get_connection()  # 從連線池中獲取連線
 
     return g.mysql_db
 
 
 @app.teardown_appcontext
-# exception代表要是有發生什麼exception的話,它就會在此參數的位置(在這裡老師不會用到,但還是寫了)
-# close_connection()在任何HTTP request結束時,都會被執行一次。
-# e.g.按「重新整理」,也就是重新送了一個HTTP request到我們的伺服器,
-# 當我們伺服器處理完這個HTTP request之後,就會執行以下的close_connection()
 def close_connection(exception):  # 這個function是被自動執行的
-    if hasattr(g, "mysql_db"):
-        g.mysql_db.close()
+    db = g.pop("mysql_db", None)  # 從g中獲取mysql_db連線
+
+    if db is not None:
+        db.close()
+
+
+# @app.teardown_appcontext
+# # exception代表要是有發生什麼exception的話,它就會在此參數的位置(在這裡老師不會用到,但還是寫了)
+# # close_connection()在任何HTTP request結束時,都會被執行一次。
+# # e.g.按「重新整理」,也就是重新送了一個HTTP request到我們的伺服器,
+# # 當我們伺服器處理完這個HTTP request之後,就會執行以下的close_connection()
+# def close_connection(exception):  # 這個function是被自動執行的
+#     if hasattr(g, "mysql_db"):
+#         g.mysql_db.close()
 
 
 @app.route('/logout', methods=['POST'])
