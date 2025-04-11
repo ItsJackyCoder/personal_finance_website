@@ -39,19 +39,6 @@ now = datetime.now()
 formatted_time = now.strftime("%Y-%m-%d %H:%M:%S")
 
 
-# def get_db():
-#     # hasattr():hasattribute,去查看g有沒有一個attribute是mysql_db
-#     if not hasattr(g, "mysql_db"):
-#         # 使用mysql.connector建立MySQL連線並存到g.mysql_db
-#         g.mysql_db = mysql.connector.connect(
-#             host=DB_CONFIG['host'],
-#             user=DB_CONFIG['user'],
-#             password=DB_CONFIG['password'],
-#             database=DB_CONFIG['database'],
-#         )
-
-#     return g.mysql_db
-
 def get_db():
     if not hasattr(g, "mysql_db"):
         g.mysql_db = mysql_pool.get_connection()  # 從連線池中獲取連線
@@ -65,16 +52,6 @@ def close_connection(exception):  # 這個function是被自動執行的
 
     if db is not None:
         db.close()
-
-
-# @app.teardown_appcontext
-# # exception代表要是有發生什麼exception的話,它就會在此參數的位置(在這裡老師不會用到,但還是寫了)
-# # close_connection()在任何HTTP request結束時,都會被執行一次。
-# # e.g.按「重新整理」,也就是重新送了一個HTTP request到我們的伺服器,
-# # 當我們伺服器處理完這個HTTP request之後,就會執行以下的close_connection()
-# def close_connection(exception):  # 這個function是被自動執行的
-#     if hasattr(g, "mysql_db"):
-#         g.mysql_db.close()
 
 
 @app.route('/logout', methods=['POST'])
