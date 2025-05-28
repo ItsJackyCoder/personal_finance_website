@@ -22,10 +22,10 @@ app.secret_key = os.urandom(24)  # 使用隨機生成的密鑰
 
 # MySQL資料庫配置
 DB_CONFIG = {
-    'host': '104.199.124.73',  # MySQL主機地址
+    'host': '34.82.23.123',  # MySQL主機地址
     'user': 'root',  # 使用者名稱
     'password': '12345',  # 密碼
-    'database': 'finance_website_db',  # 資料庫名稱
+    'database': 'financeWebsite',  # 資料庫名稱
 }
 
 mysql_pool = mysql.connector.pooling.MySQLConnectionPool(
