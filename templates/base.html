@@ -32,7 +32,7 @@
         <div class="collapse navbar-collapse" id="navbarNav">
           <!--herf="#":#代表不會到任何的網站-->
           <!--class="navbar-brand":標示這個<a> tag是我們的navbar的標示-->
-          <a class="navbar-brand text-light" href="#">
+          <a class="navbar-brand text-light" href="#" style="font-size: 1.8rem">
             <img
               src="{{ url_for('static', filename='images/finance.jpg') }}"
               alt="個人理財網站的標誌"
@@ -42,15 +42,23 @@
           </a>
           <ul class="navbar-nav">
             <li class="nav-item">
-              <a class="nav-link text-light" href="/">Home</a>
+              <a class="nav-link text-light" href="/" style="font-size: 1.2rem"
+                >Home</a
+              >
             </li>
             <li class="nav-item">
-              <a class="nav-link text-light" href="/cash"
+              <a
+                class="nav-link text-light"
+                href="/cash"
+                style="font-size: 1.2rem"
                 >Cash Inventory Form</a
               >
             </li>
             <li class="nav-item">
-              <a class="nav-link text-light" href="/stock"
+              <a
+                class="nav-link text-light"
+                href="/stock"
+                style="font-size: 1.2rem"
                 >Stock Inventory Form</a
               >
             </li>
@@ -60,17 +68,16 @@
             <!-- 歡迎訊息 -->
             {% if session.get('user_id') %}
             <span
-              class="navbar-text me-3 text-decoration-underline"
-              style="color: #333333; background-color: #ffe4b5"
+              class="navbar-text me-3"
+              style="
+                color: #333333;
+                background-color: gainsboro;
+                border-radius: 20px;
+                padding: 0.2rem;
+              "
             >
               Welcome:
-              <span
-                id="username"
-                style="
-                  font-size: 1.5rem;
-                  color: #333333;
-                  background-color: #ffe4b5;
-                "
+              <span id="username" style="font-size: 1.5rem; color: #333333"
                 >{{ session['user_id'] }}!</span
               >
             </span>
