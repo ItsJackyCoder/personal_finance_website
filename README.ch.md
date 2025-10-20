@@ -6,12 +6,10 @@
 
 介紹
 ---
-This website is designed to display the user's inventory of Taiwanese currency, US dollars, and Taiwanese stocks. The stock information reflects the latest closing prices from the Taiwan Stock Exchange on the current trading day.
+本網站用於顯示使用者持有的新台幣、美元與台灣股票之庫存情況。股票資訊以當日台灣證券交易所的最新收盤價為準。
 
-    Note:
-    Since the free version of Render is being used, the server automatically enters a dormant state 
-    after 15 minutes of inactivity. As a result, there may be a delay in loading the screen.        
-    We appreciate your understanding.
+    注意:
+    由於使用 Render 的免費方案，伺服器在 15 分鐘無操作後會自動進入休眠，因此頁面載入可能會延遲。感謝您的體諒。
 
 
 技術堆疊
