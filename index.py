@@ -22,10 +22,10 @@ app.secret_key = os.urandom(24)  # 使用隨機生成的密鑰
 
 # MySQL資料庫配置
 DB_CONFIG = {
-    'host': '34.53.7.173',  # MySQL主機地址
-    'user': 'root',  # 使用者名稱
-    'password': '12345',  # 密碼
-    'database': 'sideprojects',  # 資料庫名稱
+    'host': os.environ.get("DB_HOST"),  # MySQL主機地址
+    'user': os.environ.get("DB_USER"),  # 使用者名稱
+    'password': os.environ.get("DB_PASSWORD"),  # 密碼
+    'database': os.environ.get("DB_NAME"),  # 資料庫名稱
 }
 
 mysql_pool = mysql.connector.pooling.MySQLConnectionPool(
