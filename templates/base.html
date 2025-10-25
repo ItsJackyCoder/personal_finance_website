@@ -94,6 +94,7 @@
             </span>
 
             <!-- 登出的button -->
+            {% if session.get('user_id') %}
             <button
               id="logoutBtn"
               type="button"
@@ -102,6 +103,7 @@
             >
               Logout
             </button>
+            {% endif %}
           </div>
         </div>
       </div>
