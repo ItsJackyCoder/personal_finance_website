@@ -21,19 +21,19 @@ app = Flask(__name__)
 app.secret_key = os.urandom(24)  # 使用隨機生成的密鑰
 
 # MySQL資料庫配置
-DB_CONFIG = {
-    'host': os.environ.get("DB_HOST"),  # MySQL主機地址
-    'user': os.environ.get("DB_USER"),  # 使用者名稱
-    'password': os.environ.get("DB_PASSWORD"),  # 密碼
-    'database': os.environ.get("DB_NAME"),  # 資料庫名稱
-}
-
 # DB_CONFIG = {
-#     'host': "136.109.201.2",  # MySQL主機地址
-#     'user': "jacky",
-#     'password': "#Funny0806boy",
-#     'database': "finance-website"
+#     'host': os.environ.get("DB_HOST"),  # MySQL主機地址
+#     'user': os.environ.get("DB_USER"),  # 使用者名稱
+#     'password': os.environ.get("DB_PASSWORD"),  # 密碼
+#     'database': os.environ.get("DB_NAME"),  # 資料庫名稱
 # }
+
+DB_CONFIG = {
+    'host': "136.109.201.2",  # MySQL主機地址
+    'user': "jacky",
+    'password': "#Funny0806boy",
+    'database': "finance-website"
+}
 
 mysql_pool = mysql.connector.pooling.MySQLConnectionPool(
     pool_name="mysql_pool",
@@ -445,11 +445,17 @@ def submit_stock():
     url = "https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&stockNo=" + \
         request.values['stock-id']
 
-    response = requests.get(url)
-    data = response.json()
+    # response = requests.get(url)
+    # data = response.json()
 
-    # test
-    print(data)
+    # 測試
+    response = requests.get(url, timeout=10)
+
+    print("status_code =", response.status_code)
+    print("content-type =", response.headers.get("Content-Type"))
+    print("response.text =", response.text[:300])
+
+    # 測試
 
     # 初始化錯誤標記
     error = False
