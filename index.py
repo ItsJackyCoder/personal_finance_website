@@ -449,7 +449,13 @@ def submit_stock():
     # data = response.json()
 
     # 測試
-    response = requests.get(url, timeout=10)
+    headers = {
+        "User-Agent": "Mozilla/5.0",
+        "Referer": "https://www.twse.com.tw/",
+        "Accept": "application/json"
+    }
+
+    response = requests.get(url, headers=headers, timeout=10)
 
     print("status_code =", response.status_code)
     print("content-type =", response.headers.get("Content-Type"))
