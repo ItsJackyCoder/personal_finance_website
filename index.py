@@ -4,7 +4,7 @@
 # g:flask連接資料庫所需要的東西
 # redirect:可以讓使用者導回主畫面的模組
 from mysql.connector import pooling  # 連線池
-from datetime import datetime
+from datetime import datetime, timedelta
 import mysql.connector  # MySQL資料庫
 import os  # 為了隱藏圓餅圖的文字(如果static裡面沒有資料就不顯示文字)
 from flask import Flask, render_template, request, g, redirect, session, jsonify
@@ -21,19 +21,19 @@ app = Flask(__name__)
 app.secret_key = os.urandom(24)  # 使用隨機生成的密鑰
 
 # MySQL資料庫配置
-# DB_CONFIG = {
-#     'host': os.environ.get("DB_HOST"),  # MySQL主機地址
-#     'user': os.environ.get("DB_USER"),  # 使用者名稱
-#     'password': os.environ.get("DB_PASSWORD"),  # 密碼
-#     'database': os.environ.get("DB_NAME"),  # 資料庫名稱
-# }
-
 DB_CONFIG = {
-    'host': "136.109.201.2",  # MySQL主機地址
-    'user': "jacky",
-    'password': "#Funny0806boy",
-    'database': "finance-website"
+    'host': os.environ.get("DB_HOST"),  # MySQL主機地址
+    'user': os.environ.get("DB_USER"),  # 使用者名稱
+    'password': os.environ.get("DB_PASSWORD"),  # 密碼
+    'database': os.environ.get("DB_NAME"),  # 資料庫名稱
 }
+
+# DB_CONFIG = {
+#     'host': "136.109.201.2",  # MySQL主機地址
+#     'user': "jacky",
+#     'password': "#Funny0806boy",
+#     'database': "finance-website"
+# }
 
 mysql_pool = mysql.connector.pooling.MySQLConnectionPool(
     pool_name="mysql_pool",
@@ -44,6 +44,7 @@ mysql_pool = mysql.connector.pooling.MySQLConnectionPool(
 # 取得目前的時間
 now = datetime.now()
 formatted_time = now.strftime("%Y-%m-%d %H:%M:%S")
+latest_time = now.strftime("%Y-%m-%d")
 
 
 def get_db():
@@ -89,7 +90,7 @@ def home():
         us_dollars += data[2]
 
     # 獲取匯率資訊
-    # r是個reponse(就是你的HTTP的回應)
+    # r是個response(就是你的HTTP的回應)
     r = requests.get('https://tw.rter.info/capi.php')
 
     # r.json():會幫我們把獲得的r裡面的這些資料把它整理出來
@@ -138,19 +139,31 @@ def home():
         # 證交所的API
         # 取得目前股價
         # 這是要發HTTP request到的地方
-        url = "https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&stockNo=" + stock
+        # url = "https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&stockNo=" + stock
+
+        url = "https://api.finmindtrade.com/api/v4/data?dataset=TaiwanStockPrice&data_id=" + \
+            stock + "&start_date=" + latest_time
+
         response = requests.get(url)
         data = response.json()  # 和第56行一樣的語法
 
+        if not data.get("data"):  # []代表false
+            yesterday = (now - timedelta(days=1)).strftime("%Y-%m-%d")
+
+            url = "https://api.finmindtrade.com/api/v4/data?dataset=TaiwanStockPrice&data_id=" + \
+                stock + "&start_date=" + yesterday
+
         # data這個key的value是一個 a list of list
         # e.g.'data': [['113/10/01', '9,883,064', '1,816,503,951', '183.90', '184.60', '183.35', '183.60', '-0.35', '12,966']]
-        price_array = data['data']
+        # price_array = data['data']
 
         # 最新日期的收盤價是存在這個price_array此list的最後一項
         # price_array[len(price_array)-1]也是一個list
         # 拿到收盤價後,要轉成float,因為原本是一個string
-        current_price = float(
-            price_array[len(price_array)-1][6].replace(",", ""))  # 我自己補上的,因為float()無法處理包含逗號的數字
+        # current_price = float(
+        #     price_array[len(price_array)-1][6].replace(",", ""))  # 我自己補上的,因為float()無法處理包含逗號的數字
+
+        current_price = data.get("data")[0].get("close")
 
         # 單一股票總市值
         # 把它換成一個整數
@@ -180,6 +193,8 @@ def home():
     if len(unique_stock_list) != 0:
         # 用以下的code就可以繪製圖出來了
         labels = tuple(unique_stock_list)
+
+        print(labels)
 
         # list comprehensive的寫法(直接生成sizes這個新的list)
         sizes = [d["total_value"] for d in stock_info]
@@ -233,7 +248,7 @@ def home():
 
         # 取得想要隱藏的標籤
         # plt.gca().texts是自己設定的文本對象(可能不只一個)
-        # lbl是hidden_label這個dicitonary的每一個key
+        # lbl是hidden_label這個dictionary的每一個key
         for txt in plt.gca().texts:
             for lbl in hidden_label:
                 if hidden_label["us_dollars"] == 0 and txt.get_text() == "USD":
@@ -442,32 +457,20 @@ def submit_stock():
     userID = session.get('user_id')
 
     # 1.取得股票資訊、日期資料
-    url = "https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&stockNo=" + \
-        request.values['stock-id']
+    # url = "https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&stockNo=" + \
+    #     request.values['stock-id']
 
-    # response = requests.get(url)
-    # data = response.json()
+    url = "https://api.finmindtrade.com/api/v4/data?dataset=TaiwanStockPrice&data_id=" + \
+        request.values['stock-id'] + "&start_date=" + request.values['date']
 
-    # 測試
-    headers = {
-        "User-Agent": "Mozilla/5.0",
-        "Referer": "https://www.twse.com.tw/",
-        "Accept": "application/json"
-    }
-
-    response = requests.get(url, headers=headers, timeout=10)
-
-    print("status_code =", response.status_code)
-    print("content-type =", response.headers.get("Content-Type"))
-    print("response.text =", response.text[:300])
-
-    # 測試
+    response = requests.get(url)
+    data = response.json()
 
     # 初始化錯誤標記
     error = False
 
     # 如果查無此股票代碼,就請使用者在重新輸入一次
-    if "data" in data:
+    if data.get("data"):
         stock_id = request.values['stock-id']
 
     else:
