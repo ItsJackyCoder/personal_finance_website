@@ -239,7 +239,11 @@
 <hr />
 <div id="stock-info">
   <!--&#x1F4C8;是股票的emoji-->
-  <h3>Stock Inventory 📈</h3>
+  <h3>Stock Inventory 📈 
+    <span style="font-size:20px; font-weight:bold; font-style: italic;">
+    (updated time: {{ data["updated_time"] }})
+    </span>
+  </h3>
   <table class="table" style="text-align: center;">
     <thead class="table-success">
       <tr>
@@ -258,7 +262,14 @@
       {% for d in data["stock_info"] %}
       <tr>
         <!--這裡的d是一個dictionary-->
-        <td style="vertical-align: middle">{{d["stock_id"]}}</td>
+        <td style="vertical-align: middle; text-align:center">
+          <div>
+            {{d["stock_id"]}}
+          </div>  
+          <div style="font-size:12px; color:gray;">
+            {{ d["stock_name"] }}
+          </div>
+        </td>
         <td style="vertical-align: middle">{{d["shares"]}}</td>
         <td style="vertical-align: middle">{{d["current_price"]}}</td>
         <td style="vertical-align: middle">{{d["total_value"]}}</td>

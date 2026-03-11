@@ -105,7 +105,7 @@ def home():
         "SELECT * FROM stock WHERE userID = %s", (userID,))
 
     # a list of tuple
-    # e.g. [(1, '0050', 100, 120.0, 15, 0, '2024-10-10')]
+    # e.g. [(1, '0050', '股票名稱',100, 120.0, 15, 0, '2024-10-10')]
     stock_result = cursor.fetchall()
 
     unique_stock_list = []  # a list of string
@@ -121,6 +121,9 @@ def home():
     # 計算單一股票資訊
     stock_info = []
 
+    # 紀錄目前最新股價的更新時間
+    updated_time = 0
+
     for stock in unique_stock_list:
         cursor.execute(
             "SELECT * FROM stock WHERE stock_id = %s and userID = %s", (stock, userID))
@@ -130,11 +133,15 @@ def home():
         stock_cost = 0  # 單一股票總花費
         shares = 0  # 單一股票股數
 
-        for d in result:
-            shares += d[2]
+        stock_name = ""  # 單一股票名稱
 
-            # d[2]:股數, d[3]:價格, d[4]:手續費, d[5]:稅
-            stock_cost += d[2] * d[3] + d[4] + d[5]
+        for d in result:
+            shares += d[3]
+
+            stock_name = d[2]
+
+            # d[3]:股數, d[4]:價格, d[5]:手續費, d[6]:稅
+            stock_cost += d[3] * d[4] + d[5] + d[6]
 
         # 證交所的API
         # 取得目前股價
@@ -147,11 +154,18 @@ def home():
         response = requests.get(url)
         data = response.json()  # 和第56行一樣的語法
 
+        updated_time = latest_time
+
         if not data.get("data"):  # []代表false
             yesterday = (now - timedelta(days=1)).strftime("%Y-%m-%d")
 
             url = "https://api.finmindtrade.com/api/v4/data?dataset=TaiwanStockPrice&data_id=" + \
                 stock + "&start_date=" + yesterday
+
+            response = requests.get(url)
+            data = response.json()
+
+            updated_time = yesterday
 
         # data這個key的value是一個 a list of list
         # e.g.'data': [['113/10/01', '9,883,064', '1,816,503,951', '183.90', '184.60', '183.35', '183.60', '-0.35', '12,966']]
@@ -181,7 +195,7 @@ def home():
         # 把上面所有算的單一個股的資訊把它存進stock_info裡面
         stock_info.append({"stock_id": stock, "stock_cost": stock_cost, "total_value": total_value,
                           "average_cost": average_cost, "shares": shares, "current_price": current_price,
-                           "rate_of_return": rate_of_return})
+                           "rate_of_return": rate_of_return, "stock_name": stock_name})
 
     # 計算單一股票占總股票資產的比例
     for stock in stock_info:
@@ -278,7 +292,8 @@ def home():
     # 製作一個物件,裡面是我們所有要把它帶到index.html裡面,去填入的數值
     # os.path.exists()是一個Boolean,查看此檔案或資料夾是否存在
     data = {"show_pic_1": os.path.exists("static/piechart.jpg"), "show_pic_2": os.path.exists("static/piechart2.jpg"), "total": total,
-            "currency": currency["USDTWD"]["Exrate"], "ud": us_dollars, "td": taiwanese_dollars, "cash_result": cash_result, "stock_info": stock_info}
+            "currency": currency["USDTWD"]["Exrate"], "ud": us_dollars, "td": taiwanese_dollars, "cash_result": cash_result,
+            "stock_info": stock_info, "updated_time": updated_time}
 
     # flask就會自己到templates裡面去找到idex.html,然後去把它顯示出來
     # data=data:這樣在index.html裡面就可以用data這個物件來獲取dictionary裡面的值
@@ -460,8 +475,11 @@ def submit_stock():
     # url = "https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&stockNo=" + \
     #     request.values['stock-id']
 
-    url = "https://api.finmindtrade.com/api/v4/data?dataset=TaiwanStockPrice&data_id=" + \
-        request.values['stock-id'] + "&start_date=" + request.values['date']
+    # url = "https://api.finmindtrade.com/api/v4/data?dataset=TaiwanStockPrice&data_id=" + \
+    #     request.values['stock-id'] + "&start_date=" + request.values['date']
+
+    url = "https://api.finmindtrade.com/api/v4/data?dataset=TaiwanStockInfo&data_id=" + \
+        request.values['stock-id']
 
     response = requests.get(url)
     data = response.json()
@@ -472,6 +490,7 @@ def submit_stock():
     # 如果查無此股票代碼,就請使用者在重新輸入一次
     if data.get("data"):
         stock_id = request.values['stock-id']
+        stock_name = data.get("data")[0].get("stock_name")
 
     else:
         # flash("查無此股票代碼,請重新輸入!")  # 設置一次性訊息
@@ -501,8 +520,8 @@ def submit_stock():
     cursor = conn.cursor()
 
     # transaction_id可以不用管它
-    cursor.execute("INSERT INTO stock (stock_id, stock_num, stock_price, processing_fee, tax, date_info, userID) VALUES (%s, %s, %s, %s, %s, %s, %s)",
-                   (stock_id, stock_num, stock_price, processing_fee, tax, date, userID))
+    cursor.execute("INSERT INTO stock (stock_id, stock_name, stock_num, stock_price, processing_fee, tax, date_info, userID) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+                   (stock_id, stock_name, stock_num, stock_price, processing_fee, tax, date, userID))
 
     conn.commit()
 
