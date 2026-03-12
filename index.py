@@ -22,18 +22,11 @@ app = Flask(__name__)
 app.secret_key = os.urandom(24)  # 使用隨機生成的密鑰
 
 # MySQL資料庫配置
-# DB_CONFIG = {
-#     'host': os.environ.get("DB_HOST"),  # MySQL主機地址
-#     'user': os.environ.get("DB_USER"),  # 使用者名稱
-#     'password': os.environ.get("DB_PASSWORD"),  # 密碼
-#     'database': os.environ.get("DB_NAME"),  # 資料庫名稱
-# }
-
 DB_CONFIG = {
-    'host': "136.109.201.2",  # MySQL主機地址
-    'user': "jacky",
-    'password': "#Funny0806boy",
-    'database': "finance-website"
+    'host': os.environ.get("DB_HOST"),  # MySQL主機地址
+    'user': os.environ.get("DB_USER"),  # 使用者名稱
+    'password': os.environ.get("DB_PASSWORD"),  # 密碼
+    'database': os.environ.get("DB_NAME"),  # 資料庫名稱
 }
 
 mysql_pool = mysql.connector.pooling.MySQLConnectionPool(
@@ -79,7 +72,27 @@ def logout():
 
 @app.route("/")
 def home():
+    ####
     userID = session.get('user_id')
+    show_modal = userID is None
+
+    print("userID =", userID)
+    print("show_modal =", show_modal)
+
+    if show_modal:
+        data = {
+            "show_pic_1": False,
+            "show_pic_2": False,
+            "total": 0,
+            "currency": 0,
+            "ud": 0,
+            "td": 0,
+            "cash_result": [],
+            "total_stock_info": [],
+            "updated_time": 0
+        }
+
+        return render_template("index.html", data=data, show_modal=show_modal)
 
     # 除了要render index.html之外,也要顯示出我們現金庫存的狀況
     con = get_db()
@@ -199,52 +212,10 @@ def home():
 
         total_stock_cost += stock_cost
 
-        # 證交所的API
-        # 取得目前股價
-        # 這是要發HTTP request到的地方
-        # url = "https://api.finmindtrade.com/api/v4/data?dataset=TaiwanStockPrice&data_id=" + \
-        #     stock + "&start_date=" + latest_time + "&token=" + token
-
-        # response = requests.get(url)
-        # data = response.json()  # 和第56行一樣的語法
-
-        # updated_time = latest_time
-
-        # if not data.get("data"):  # []代表false
-        #     yesterday = (now - timedelta(days=1)).strftime("%Y-%m-%d")
-
-        #     url = "https://api.finmindtrade.com/api/v4/data?dataset=TaiwanStockPrice&data_id=" + \
-        #         stock + "&start_date=" + yesterday + "&token=" + token
-
-        #     response = requests.get(url)
-        #     data = response.json()
-
-        #     updated_time = yesterday
-
-        # data這個key的value是一個 a list of list
-        # e.g.'data': [['113/10/01', '9,883,064', '1,816,503,951', '183.90', '184.60', '183.35', '183.60', '-0.35', '12,966']]
-        # price_array = data['data']
-
-        # 最新日期的收盤價是存在這個price_array此list的最後一項
-        # price_array[len(price_array)-1]也是一個list
-        # 拿到收盤價後,要轉成float,因為原本是一個string
-        # current_price = float(
-        #     price_array[len(price_array)-1][6].replace(",", ""))  # 我自己補上的,因為float()無法處理包含逗號的數字
-
-        # current_price = data.get("data")[0].get("close")
-
         # 單一股票總市值
         # 把它換成一個整數
         total_value = round(current_price * shares)  # 或是int():直接截斷小數位數
         total_stock_value += total_value
-
-        # 單一股票平均成本
-        # average_cost = round(stock_cost / shares, 2)  # 取到小數點後第二位
-
-        # 單一股票的報酬率
-        # 因為index.html的報酬率是用百分比呈現的,所以要*100
-        # rate_of_return = round((total_value - stock_cost)
-        #                        * 100 / stock_cost, 2)
 
         # 把上面所有算的單一個股的資訊把它存進stock_info裡面
         stock_info.append(
@@ -254,12 +225,6 @@ def home():
 
     total_stock_info.append({"total_stock_value": total_stock_value, "total_stock_cost": total_stock_cost,
                              "total_profit": total_profit})
-
-    # 計算單一股票占總股票資產的比例
-    # for stock in stock_info:
-    #     # 新增"value_percentage"這個key在stock這個dictionary裡面!
-    #     stock["value_percentage"] = round(
-    #         stock["total_value"] * 100 / total_stock_value, 2)
 
     # 如果unique_stock_list裡面有東西,我們再來繪製股票的圓餅圖,否則則不需要繪製
     # 繪製股票圓餅圖
@@ -373,7 +338,7 @@ def home():
 
     # flask就會自己到templates裡面去找到idex.html,然後去把它顯示出來
     # data=data:這樣在index.html裡面就可以用data這個物件來獲取dictionary裡面的值
-    return render_template("index.html", data=data)
+    return render_template("index.html", data=data, show_modal=show_modal)
 
 
 @app.route("/", methods=["POST"])

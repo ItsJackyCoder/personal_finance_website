@@ -265,26 +265,29 @@
 
 <script>
   window.onload = function () {
+    const shouldShowModal = {{ show_modal | tojson }};
+
     // 檢查 localStorage 中是否有 "formSubmitted" 標記
-    if (!localStorage.getItem("formSubmitted")) {
+    // if (!localStorage.getItem("formSubmitted")) {
+    if (shouldShowModal) {
       // 如果尚未提交表單, 顯示模態框
       var introModal = document.getElementById("introModal");
-        introModal.style.display = "block"; // 顯示模態框
+      // introModal.style.display = "block"; // 顯示模態框
 
-        var myModal = new bootstrap.Modal(introModal); // 初始化 Bootstrap Modal
-        myModal.show();
+      var myModal = new bootstrap.Modal(introModal); // 初始化 Bootstrap Modal
+      myModal.show();
 
-        // 只虛化背景,不虛化彈跳視窗(利用"main-content"包裹住需要虛化的地方)
-        document.getElementById("main-content").classList.add("blurred");
+      // 只虛化背景,不虛化彈跳視窗(利用"main-content"包裹住需要虛化的地方)
+      document.getElementById("main-content").classList.add("blurred");
 
-        // 如果尚未提交表單,強制顯示模態框
-        // var myModal = new bootstrap.Modal(document.getElementById("introModal"));
-        // myModal.show();
+      // 如果尚未提交表單,強制顯示模態框
+      // var myModal = new bootstrap.Modal(document.getElementById("introModal"));
+      // myModal.show();
     }
-    else {
-        // 如果已提交過表單，則直接載入資料
-        console.log("跳過表單"); //測試用
-    }
+    // else {
+    //     // 如果已提交過表單，則直接載入資料
+    //     console.log("跳過表單"); //測試用
+    // }
 
 };
   //登入頁面的「確認」button
@@ -306,7 +309,7 @@
         if (data.status === "success") {
             // 表單提交成功,儲存已提交的狀態到localStorage(這樣即使開其他分頁也會保留紀錄)
             //sessionStorage:只會保留當前頁面的狀態
-            localStorage.setItem("formSubmitted", "true");
+            //localStorage.setItem("formSubmitted", "true");
 
             // 隱藏彈出視窗並重新載入頁面
             var myModal = bootstrap.Modal.getInstance(document.getElementById("introModal"));
@@ -326,7 +329,7 @@
             //myModal._element.addEventListener('hidden.bs.modal', function () {
             //document.getElementById("main-content").classList.remove("blurred");});
             
-            location.reload();
+            //location.reload();
         } else {
             // 顯示錯誤訊息並保持彈出視窗開啟
             var inputError = document.getElementById("inputError");
@@ -364,7 +367,7 @@
         if (data.status === "success") {
             // 表單提交成功,儲存已提交的狀態到localStorage(這樣即使開其他分頁也會保留紀錄)
             //sessionStorage:只會保留當前頁面的狀態
-            localStorage.setItem("formSubmitted", "true");
+            //localStorage.setItem("formSubmitted", "true");
 
             // 隱藏彈出視窗並重新載入頁面
             var myModal = bootstrap.Modal.getInstance(document.getElementById("introModal"));
