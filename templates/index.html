@@ -166,7 +166,17 @@
 <div id="main-content"><!--虛化開始-->
 <div id="cash-info">
   <!--&#x1F4B5;是鈔票的emoji-->
-  <h3>Cash Inventory 💵</h3>
+  <h3>
+    💵 Cash Inventory
+    <small>
+      <a href="{{ url_for('cash_inventory') }}" style="margin-left:15px">
+        <img src="{{ url_for('static', filename='click.png') }}" 
+             title="View Cash Inventory"
+             width="50">
+        </img>
+      </a>
+    </small>
+  </h3>
   <table class="table" style="text-align: center;">
     <thead class="table-success">
       <tr>
@@ -178,127 +188,47 @@
     </thead>
     <tbody>
       <tr>
-        <td>{{data["td"]}}</td>
-        <td>{{data["ud"]}}</td>
+        <td>{{"{:,}".format(data["td"])}}</td>
+        <td>{{"{:,}".format(data["ud"])}}</td>
         <td>{{data["currency"]}} TWD</td>
-        <td>{{data["total"]}} TWD</td>
+        <td>{{"{:,}".format(data["total"])}} TWD</td>
       </tr>
-    </tbody>
-  </table>
-
-  <h5>Cash Adjustment Record</h5>
-  <!--從bootstrap那邊來的,可以去參考那邊的table的範例-->
-  <table class="table" style="text-align: center;"> 
-    <thead class="table-success">
-      <tr>
-        <!--col:column-->
-        <th scope="col" style="display: none">ID</th>
-        <th scope="col">TWD</th>
-        <th scope="col">USD</th>
-        <th scope="col">Notes</th>
-        <th scope="col">Date</th>
-        <th scope="col"></th>
-      </tr>
-    </thead>
-    <tbody>
-      <!--用for loop去把index.py裡的第67行的cash_result裡面的資料塞進表格裡面-->
-      <!--cash_result是個a list of tuple-->
-      {% for data in data["cash_result"] %}
-      <!--這裡面就可以使用data["cash_result"]這個list裡面的每一筆資料-->
-      <tr>
-        <!--style="vertical-align: middle":垂直置中-->
-        <td style="vertical-align: middle; display: none">{{data[0]}}</td>
-        <td style="vertical-align: middle">{{data[1]}}</td>
-        <td style="vertical-align: middle">{{data[2]}}</td>
-        <td style="vertical-align: middle">{{data[3]}}</td>
-        <td style="vertical-align: middle">{{data[4]}}</td>
-        <td style="width:20%">
-          <!--這裡不能只做一個button,而是要作一個form,這是因為我們要透過這個form,
-          當使用者按下「刪除此筆資料」這個button之後,它會寄送一個HTTP的POST request
-          到我們的index.py的伺服器,它寄送request之後,我們的伺服器再來處理這個request-->
-          <form action="/cash-delete" method="post" style="display: inline; margin-right: 5px;">
-            <!--作一個沒人看到的<input> tag-->
-            <!--當使用者按下「刪除此筆資料」時,data[0]這筆資料就會被到後端的伺服器-->
-            <input type="hidden" name="id" value="{{data[0]}}" />
-            <!--btn-primary:設定button的背景是藍色-->
-            <button class="btn btn-outline-success">Delete</button>
-          </form>
-          
-          <!--更新按鈕-->
-          <form action="/cash-update" method="post" style="display: inline">
-            <input type="hidden" name="updateId" value="{{data[0]}}" />
-            <button class="btn btn-outline-success">Update</button>
-          </form>
-        </td>        
-      </tr>
-      {% endfor %}
     </tbody>
   </table>
 </div>
 
-<hr />
+<br><br>
 <div id="stock-info">
   <!--&#x1F4C8;是股票的emoji-->
-  <h3>Stock Inventory 📈 
-    <span style="font-size:20px; font-weight:bold; font-style: italic;">
-    (updated time: {{ data["updated_time"] }})
-    </span>
+  <h3>
+    📈 Stock Inventory
+    <small>
+      <a href="{{ url_for('stock_inventory') }}" style="margin-left:15px">
+        <img src="{{ url_for('static', filename='click.png') }}" 
+             title="View Stock Inventory"
+             width="50">
+        </img>
+      </a>
+    </small>
   </h3>
   <table class="table" style="text-align: center;">
     <thead class="table-success">
       <tr>
-        <th scope="col">Stock Code</th>
-        <th scope="col">Number of Shares Held</th>
-        <th scope="col">Current Stock Price</th>
-        <th scope="col">Current Market Value</th>
-        <th scope="col">Stock Asset Proportion(%)</th>
+        <th scope="col">Total Market Value</th>
         <th scope="col">Total Purchase Cost(including Fees)</th>
-        <th scope="col">Average Cost</th>
-        <th scope="col">Return Rate(%)</th>
-        <th scope="col"></th>
+        <th scope="col">Total Profit / Loss</th>
       </tr>
     </thead>
     <tbody>
-      {% for d in data["stock_info"] %}
+      {% for d in data["total_stock_info"] %}
       <tr>
         <!--這裡的d是一個dictionary-->
-        <td style="vertical-align: middle; text-align:center">
-          <div>
-            {{d["stock_id"]}}
-          </div>  
-          <div style="font-size:12px; color:gray;">
-            {{ d["stock_name"] }}
-          </div>
-        </td>
-        <td style="vertical-align: middle">{{d["shares"]}}</td>
-        <td style="vertical-align: middle">{{d["current_price"]}}</td>
-        <td style="vertical-align: middle">{{d["total_value"]}}</td>
-        <td style="vertical-align: middle">{{d["value_percentage"]}}</td>
-        <td style="vertical-align: middle">{{d["stock_cost"]}}</td>
-        <td style="vertical-align: middle">{{d["average_cost"]}}</td>
-        <td style="vertical-align: middle" class="{% if d['rate_of_return'] < 0 %} text-success{% else %} text-danger{% endif %}">
-          {{ d["rate_of_return"] }}
-        </td>
-        <td>
-          <form action="/stock-delete" method="post">
-            <!--作一個沒人看到的<input> tag-->
-            <!--當使用者按下「刪除此筆資料」時,data[0]這筆資料就會被到後端的伺服器-->
-            <input type="hidden" name="stock_id" value="{{d['stock_id']}}" />
-            <!--btn-primary:設定button的背景是藍色-->
-            <button class="btn btn-outline-success">Delete</button>
-          </form>
-
-          <!--更新按鈕-->
-          <form action="/stock-update" method="post" style="margin-top: 10px">
-            <input type="hidden" name="updateStockId" value="{{d['stock_id']}}" />
-            <button class="btn btn-outline-success">Update</button>
-          </form>
-
-           <!--明細按鈕-->
-           <form action="/stock-statements" method="post" style="margin-top: 10px">
-            <input type="hidden" name="statementsId" value="{{d['stock_id']}}" />
-            <button class="btn btn-outline-success">Details</button>
-          </form>
+        <td style="vertical-align: middle; text-align:center">{{"{:,}".format(d["total_stock_value"])}}</td>
+        <td style="vertical-align: middle">{{"{:,}".format(d["total_stock_cost"])}}</td>
+        <td style="vertical-align: middle" class="{% if d['total_profit'] < 0 %} text-success{% else %} text-danger{% endif %}">
+          {% if d["total_profit"] < 0 %} -{{ "{:,}".format(d["total_profit"]|abs) }}
+          {% else %} +{{ "{:,}".format(d["total_profit"]) }}
+          {% endif %}
         </td>
       </tr>
       {% endfor %}
@@ -306,18 +236,19 @@
   </table>
 </div>
 
-<hr />
+<br><br>
+
 <!--不懂CSS沒關西,因為這都是網頁課程裡的內容-->
 <div id="chart" style="display: flex; flex-wrap: wrap" >
   <!--去判斷要不要顯示figure-->
   {% if data["show_pic_1"] %}
   <figure style="flex: 0 1 500px; margin: 10px">
-    <figcaption>Stock Warehouse Occupancy Chart</figcaption>
+    <figcaption style="font-size: 18px;">Stock Warehouse Occupancy Chart</figcaption>
     <img style="width: 100%" src="/static/piechart.jpg" alt="股票庫存占比圖" />
   </figure>
   {% endif %} {% if data["show_pic_2"] %}
   <figure style="flex: 0 1 500px; margin: 15px">
-    <figcaption>Asset Ratio Chart</figcaption>
+    <figcaption style="font-size: 18px;">Asset Ratio Chart</figcaption>
     <img style="width: 100%" src="/static/piechart2.jpg" alt="資產比例占比圖" />
   </figure>
   {% endif %}

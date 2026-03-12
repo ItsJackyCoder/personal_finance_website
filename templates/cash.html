@@ -4,7 +4,7 @@
 <!--不同地方的html要貼在這裡面-->
 {% block content%}
 <!--form action:代表我們要把這個form交到哪裡去-->
-<form action="/cash" method="POST" onsubmit="return validateForm()">
+<form action="/cash" method="POST" onsubmit="return validateForm();">
   <div class="mb-3">
     <!--class不用改,因為bootstrap都有設定過-->
     <label for="taiwanese-dollars" class="form-label">TWD </label>
@@ -19,7 +19,7 @@
       name="taiwanese-dollars"
       value="{{ data[1] | default('') }}"
       placeholder="Please enter TWD amount(e.g.10000)"
-      min="0"
+      min="-9999999"
       max="999999999"
     />
   </div>
@@ -36,7 +36,7 @@
       name="us-dollars"
       value="{{ data[2] | default('') }}"
       placeholder="Please enter USD amount(e.g.500)"
-      min="0"
+      min="-999999"
       max="9999999"
     />
   </div>

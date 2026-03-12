@@ -1,0 +1,105 @@
+{% extends "base.html" %} {% block content%}
+<div
+  class="modal fade"
+  id="introModal"
+  tabindex="-1"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+  data-bs-backdrop="static"
+  data-bs-keyboard="false"
+  style="display: none"
+></div>
+
+<div id="main-content">
+  <div id="stock-info">
+    <!--&#x1F4C8;是股票的emoji-->
+    <h3>
+      Stock Holdings 📈
+      <span style="font-size: 20px; font-weight: bold; font-style: italic">
+        (Last updated: {{ data["updated_time"] }})
+      </span>
+    </h3>
+    <table class="table" style="text-align: center">
+      <thead class="table-success">
+        <tr>
+          <th scope="col">Stock Code</th>
+          <th scope="col">Number of Shares Held</th>
+          <th scope="col">Current Stock Price</th>
+          <th scope="col">Current Market Value</th>
+          <th scope="col">Stock Asset Proportion(%)</th>
+          <th scope="col">Total Purchase Cost(including Fees)</th>
+          <th scope="col">Average Cost</th>
+          <th scope="col">Return Rate(%)</th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for d in data["stock_info"] %}
+        <tr>
+          <!--這裡的d是一個dictionary-->
+          <td style="vertical-align: middle; text-align: center">
+            <div>{{d["stock_id"]}}</div>
+            <div style="font-size: 12px; color: gray">
+              {{ d["stock_name"] }}
+            </div>
+          </td>
+          <td style="vertical-align: middle">{{"{:,}".format(d["shares"])}}</td>
+          <td style="vertical-align: middle">
+            {{"{:,}".format(d["current_price"])}}
+          </td>
+          <td style="vertical-align: middle">
+            {{"{:,}".format(d["total_value"])}}
+          </td>
+          <td style="vertical-align: middle">{{d["value_percentage"]}}</td>
+          <td style="vertical-align: middle">
+            {{"{:,}".format(d["stock_cost"])}}
+          </td>
+          <td style="vertical-align: middle">
+            {{"{:,}".format(d["average_cost"])}}
+          </td>
+          <td
+            style="vertical-align: middle"
+            class="{% if d['rate_of_return'] < 0 %} text-success{% else %} text-danger{% endif %}"
+          >
+            {{ d["rate_of_return"] }}
+          </td>
+          <td>
+            <form action="/stock-delete" method="post">
+              <!--作一個沒人看到的<input> tag-->
+              <!--當使用者按下「刪除此筆資料」時,data[0]這筆資料就會被到後端的伺服器-->
+              <input type="hidden" name="stock_id" value="{{d['stock_id']}}" />
+              <!--btn-primary:設定button的背景是藍色-->
+              <button class="btn btn-outline-success">Delete</button>
+            </form>
+
+            <!--更新按鈕-->
+            <form action="/stock-update" method="post" style="margin-top: 10px">
+              <input
+                type="hidden"
+                name="updateStockId"
+                value="{{d['stock_id']}}"
+              />
+              <button class="btn btn-outline-success">Update</button>
+            </form>
+
+            <!--明細按鈕-->
+            <form
+              action="/stock-statements"
+              method="post"
+              style="margin-top: 10px"
+            >
+              <input
+                type="hidden"
+                name="statementsId"
+                value="{{d['stock_id']}}"
+              />
+              <button class="btn btn-outline-success">Details</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

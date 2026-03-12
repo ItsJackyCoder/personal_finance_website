@@ -1,0 +1,62 @@
+{% extends "base.html" %} {% block content%}
+<div id="main-content">
+  <div id="cash-info">
+    <!--&#x1F4B5;是鈔票的emoji-->
+    <h3>Cash Transaction Records</h3>
+    <table class="table" style="text-align: center">
+      <thead class="table-success">
+        <tr>
+          <!--col:column-->
+          <th scope="col" style="display: none">ID</th>
+          <th scope="col">TWD</th>
+          <th scope="col">USD</th>
+          <th scope="col">Notes</th>
+          <th scope="col">Date</th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <!--用for loop去把index.py裡的第67行的cash_result裡面的資料塞進表格裡面-->
+        <!--cash_result是個a list of tuple-->
+        {% for data in data["cash_result"] %}
+        <!--這裡面就可以使用data["cash_result"]這個list裡面的每一筆資料-->
+        <tr>
+          <!--style="vertical-align: middle":垂直置中-->
+          <td style="vertical-align: middle; display: none">{{data[0]}}</td>
+          <td style="vertical-align: middle">
+            {{ "{:,}".format(data[1]) if data[1] != 0 else "" }}
+          </td>
+          <td style="vertical-align: middle">
+            {{ "{:,}".format(data[2]) if data[2] != 0 else "" }}
+          </td>
+          <td style="vertical-align: middle">{{data[3]}}</td>
+          <td style="vertical-align: middle">{{data[4]}}</td>
+          <td style="width: 20%">
+            <!--這裡不能只做一個button,而是要作一個form,這是因為我們要透過這個form,
+          當使用者按下「刪除此筆資料」這個button之後,它會寄送一個HTTP的POST request
+          到我們的index.py的伺服器,它寄送request之後,我們的伺服器再來處理這個request-->
+            <form
+              action="/cash-delete"
+              method="post"
+              style="display: inline; margin-right: 5px"
+            >
+              <!--作一個沒人看到的<input> tag-->
+              <!--當使用者按下「刪除此筆資料」時,data[0]這筆資料就會被到後端的伺服器-->
+              <input type="hidden" name="id" value="{{data[0]}}" />
+              <!--btn-primary:設定button的背景是藍色-->
+              <button class="btn btn-outline-success">Delete</button>
+            </form>
+
+            <!--更新按鈕-->
+            <form action="/cash-update" method="post" style="display: inline">
+              <input type="hidden" name="updateId" value="{{data[0]}}" />
+              <button class="btn btn-outline-success">Update</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endblock %}
+</div>
