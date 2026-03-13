@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -132,11 +132,8 @@
           .then((response) => response.json())
           .then((data) => {
             if (data.message === "Logged out successfully!") {
-              // 清除 localStorage 資料
-              localStorage.clear();
-
               // 登出成功後隱藏按鈕
-              document.getElementById("logoutBtn").style.display = "none";
+              //document.getElementById("logoutBtn").style.display = "none";
               location.replace("/"); // 重新載入頁面並清空資料
             }
           })

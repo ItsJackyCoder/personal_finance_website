@@ -4,7 +4,7 @@
 # g:flask連接資料庫所需要的東西
 # redirect:可以讓使用者導回主畫面的模組
 from mysql.connector import pooling  # 連線池
-from datetime import date, datetime, time, timedelta
+from datetime import date, datetime, time
 from zoneinfo import ZoneInfo
 import mysql.connector  # MySQL資料庫
 import os  # 為了隱藏圓餅圖的文字(如果static裡面沒有資料就不顯示文字)
@@ -38,10 +38,8 @@ mysql_pool = mysql.connector.pooling.MySQLConnectionPool(
 # Findmind的token
 token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJkYXRlIjoiMjAyNi0wMy0xMiAxNDoxMDoxNyIsInVzZXJfaWQiOiJqYWNreTUzNzI4IiwiZW1haWwiOiJqYWNreTUzNzI4QGdtYWlsLmNvbSIsImlwIjoiNjEuNzQuMzIuMTEyIn0.cXnO9npd-rvHzZ94WGIC5HlUcFWWOnDgB5K3o9hmf-0"
 
-# 取得目前的時間
 
-
-def current_time():
+def current_time():  # 取得目前的時間
     return datetime.now(ZoneInfo("Asia/Taipei"))
     # return now.strftime("%Y-%m-%d %H:%M:%S")
     # latest_time = now.strftime("%Y-%m-%d")
@@ -65,7 +63,7 @@ def close_connection(exception):  # 這個function是被自動執行的
 @app.route('/logout', methods=['POST'])
 def logout():
     # 刪除session中的user_id
-    session.clear()  # 清除 session 表示登出
+    session.pop("user_id", None)  # 清除 session 表示登出
 
     return jsonify({"message": "Logged out successfully!"})
 
@@ -75,9 +73,6 @@ def home():
     ####
     userID = session.get('user_id')
     show_modal = userID is None
-
-    print("userID =", userID)
-    print("show_modal =", show_modal)
 
     if show_modal:
         data = {
@@ -500,13 +495,16 @@ def cash_update():
 
 @app.route("/cash-inventory")
 def cash_inventory():
+    if "user_id" not in session:  # 如果user沒有登入,也就沒有Session,所以就導回主頁面
+        return redirect("/")
+
     userID = session.get('user_id')
 
     # 除了要render index.html之外,也要顯示出我們現金庫存的狀況
     con = get_db()
     cursor = con.cursor()
     cursor.execute(
-        "SELECT * FROM cash WHERE userID = %s ORDER BY date_info ASC", (userID,))  # 升序
+        "SELECT * FROM cash WHERE userID = %s ORDER BY date_info DESC", (userID,))  # 降序
     cash_result = cursor.fetchall()  # a list of tuple
 
     data = {"cash_result": cash_result}
@@ -602,6 +600,9 @@ def submit_stock():  # 提交股票資料時
 
 @app.route("/stock-inventory")
 def stock_inventory():
+    if "user_id" not in session:  # 如果user沒有登入,也就沒有Session,所以就導回主頁面
+        return redirect("/")
+
     userID = session.get('user_id')
 
     # 除了要render index.html之外,也要顯示出我們現金庫存的狀況
@@ -663,30 +664,6 @@ def stock_inventory():
         result = cursor.fetchall()  # 只會有一筆
 
         stock_name = result[-1][1]
-
-        # url = "https://api.finmindtrade.com/api/v4/data?dataset=TaiwanStockPrice&data_id=" + \
-        #     stock + "&start_date=" + latest_time + "&token=" + token
-
-        # response = requests.get(url)
-        # data = response.json()
-
-        # updated_time = latest_time
-
-        # if not data.get("data"):  # []代表false
-        #     yesterday = (now - timedelta(days=1)).strftime("%Y-%m-%d")
-
-        #     url = "https://api.finmindtrade.com/api/v4/data?dataset=TaiwanStockPrice&data_id=" + \
-        #         stock + "&start_date=" + yesterday + "&token=" + token
-
-        #     response = requests.get(url)
-        #     data = response.json()
-
-        #     updated_time = yesterday
-
-        # data這個key的value是一個 a list of list
-        # e.g.'data': [['113/10/01', '9,883,064', '1,816,503,951', '183.90', '184.60', '183.35', '183.60', '-0.35', '12,966']]
-
-        # current_price = data.get("data")[0].get("close")
 
         # 單一股票總市值
         # 把它換成一個整數
@@ -790,7 +767,7 @@ def stock_sell():
     return redirect("/")
 
 
-@app.route("/stock-statements", methods=["POST"])
+@app.route("/stock-statement", methods=["POST"])
 def stock_statements():
     stockID = request.form["statementsId"]
     userID = session.get('user_id')
