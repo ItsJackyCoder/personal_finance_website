@@ -167,12 +167,16 @@
 <div id="cash-info">
   <!--&#x1F4B5;是鈔票的emoji-->
   <h3>
-    💵 Cash Inventory
+    <img 
+      src="{{ url_for('static', filename='icon/cash.gif') }}" 
+      alt="cash"
+      width="50px"
+      height="50px"> Cash Inventory
     <small>
       <a href="{{ url_for('cash_inventory') }}" style="margin-left:15px">
-        <img src="{{ url_for('static', filename='click.png') }}" 
+        <img src="{{ url_for('static', filename='icon/click.gif') }}" 
              title="View Cash Inventory"
-             width="50">
+             width="40">
         </img>
       </a>
     </small>
@@ -201,12 +205,16 @@
 <div id="stock-info">
   <!--&#x1F4C8;是股票的emoji-->
   <h3>
-    📈 Stock Inventory
+    <img 
+      src="{{ url_for('static', filename='icon/stock.gif') }}" 
+      alt="cash"
+      width="50px"
+      height="50px"> Stock Inventory
     <small>
       <a href="{{ url_for('stock_inventory') }}" style="margin-left:15px">
-        <img src="{{ url_for('static', filename='click.png') }}" 
+        <img src="{{ url_for('static', filename='icon/click.gif') }}" 
              title="View Stock Inventory"
-             width="50">
+             width="40">
         </img>
       </a>
     </small>

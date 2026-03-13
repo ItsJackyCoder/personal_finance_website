@@ -94,9 +94,10 @@ def home():
     cursor = con.cursor()
 
     cursor.execute(
-        "SELECT last_updated_time FROM stock ORDER BY transaction_id ASC LIMIT 1")
+        "SELECT MIN(last_updated_time) FROM stock WHERE userID=%s", (userID,))
 
-    last_updated_time = cursor.fetchone()[0]
+    row = cursor.fetchone()
+    last_updated_time = row[0] if row else None
 
     # 如果資料庫抓出來的是naive datetime,補上台灣時區
     if last_updated_time is not None and last_updated_time.tzinfo is None:
@@ -108,19 +109,36 @@ def home():
     today_3pm = datetime.combine(current_time().date(), time(
         15, 0), tzinfo=ZoneInfo("Asia/Taipei"))
 
-    if current_time() >= today_3pm and last_updated_time < today_3pm:
-        url = "https://api.finmindtrade.com/api/v4/data?dataset=TaiwanStockPrice&data_id=" + \
-            request.values['stock-id'] + "&start_date=" + \
-            current_time().strftime("%Y-%m-%d") + "&token=" + token
-
-        response = requests.get(url)
-        data = response.json()
-
-        current_price = data.get("data")[0].get("close")
-
+    if current_time() >= today_3pm and (last_updated_time is None or last_updated_time < today_3pm):
         cursor.execute(
-            "UPDATE stock SET current_price = %s, last_updated_time = %s", (
-                current_price, current_time().strftime("%Y-%m-%d %H:%M:%S")))
+            "SELECT DISTINCT stock_id FROM stock WHERE userID = %s", (userID,))
+
+        stock_ids = cursor.fetchall()  # e.g.[('2330',), ('2317',), ('2454',)]
+
+        for row in stock_ids:
+            stock_id = row[0]
+
+            url = "https://api.finmindtrade.com/api/v4/data?dataset=TaiwanStockPrice&data_id=" + \
+                stock_id + "&start_date=" + \
+                current_time().strftime("%Y-%m-%d") + "&token=" + token
+
+            response = requests.get(url)
+            api_data = response.json()
+
+            # 防呆
+            stock_data = api_data.get("data", [])
+            if not stock_data:
+                continue
+
+            current_price = stock_data[0].get("close")
+            if current_price is None:
+                continue
+
+            cursor.execute(
+                "UPDATE stock SET current_price = %s, last_updated_time = %s WHERE stock_id= %s AND userID =%s", (
+                    current_price, current_time().strftime("%Y-%m-%d %H:%M:%S"), stock_id, userID))
+
+        con.commit()
 
     cursor.execute(
         "SELECT * FROM cash WHERE userID = %s ORDER BY date_info ASC", (userID,))  # 升序
@@ -193,8 +211,6 @@ def home():
 
         for d in result:
             shares += d[3]
-
-            # stock_name = d[2]
 
             # d[3]:股數, d[4]:價格, d[5]:手續費, d[6]:稅
             stock_cost += round(d[3] * d[4] + d[5] + d[6])
