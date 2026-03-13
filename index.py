@@ -29,6 +29,7 @@ DB_CONFIG = {
     'database': os.environ.get("DB_NAME"),  # 資料庫名稱
 }
 
+
 mysql_pool = mysql.connector.pooling.MySQLConnectionPool(
     pool_name="mysql_pool",
     pool_size=8,
@@ -70,7 +71,6 @@ def logout():
 
 @app.route("/")
 def home():
-    ####
     userID = session.get('user_id')
     show_modal = userID is None
 
@@ -109,9 +109,6 @@ def home():
         15, 0), tzinfo=ZoneInfo("Asia/Taipei"))
 
     if current_time() >= today_3pm and last_updated_time < today_3pm:
-        response = requests.get(url)
-        data = response.json()
-
         url = "https://api.finmindtrade.com/api/v4/data?dataset=TaiwanStockPrice&data_id=" + \
             request.values['stock-id'] + "&start_date=" + \
             current_time().strftime("%Y-%m-%d") + "&token=" + token
