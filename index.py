@@ -10,6 +10,7 @@ import mysql.connector  # MySQL資料庫
 import os  # 為了隱藏圓餅圖的文字(如果static裡面沒有資料就不顯示文字)
 from flask import Flask, render_template, request, g, redirect, session, jsonify
 # import uuid
+import numpy as np
 import requests  # 為了全球即時匯率的API而使用的module
 import math
 import matplotlib.pyplot as plt
@@ -28,6 +29,7 @@ DB_CONFIG = {
     'password': os.environ.get("DB_PASSWORD"),  # 密碼
     'database': os.environ.get("DB_NAME"),  # 資料庫名稱
 }
+
 
 mysql_pool = mysql.connector.pooling.MySQLConnectionPool(
     pool_name="mysql_pool",
@@ -234,6 +236,7 @@ def home():
                              "total_profit": total_profit})
 
     # 如果unique_stock_list裡面有東西,我們再來繪製股票的圓餅圖,否則則不需要繪製
+
     # 繪製股票圓餅圖
     if len(unique_stock_list) != 0:
         # 用以下的code就可以繪製圖出來了
@@ -243,12 +246,13 @@ def home():
         sizes = [d["total_value"] for d in stock_info]
 
         # 根據list裡的資料數量來決定explode的數量
-        e1 = [0.05 for i in range(len(stock_info))]
+        e1 = [0.03 for i in range(len(stock_info))]
 
         fig, ax = plt.subplots(figsize=(6, 5))
+        color_stock = plt.cm.Pastel1(np.linspace(0, 1, len(sizes)))
+
         ax.pie(sizes, explode=e1, labels=labels,
-               colors=['olivedrab', '#9ACD32',
-                       '#15B01A', '#AAFF32', '#008000'],
+               colors=color_stock,
                textprops={"size": "15"}, autopct=None, shadow=None)
 
         fig.subplots_adjust(top=1, bottom=0, right=1,
@@ -262,7 +266,7 @@ def home():
         except:  # 如果圖片不存在,我們就不刪除
             pass
 
-    # 繪製股票現金圓餅圖
+    # 繪製現金圓餅圖
     if us_dollars != 0 or taiwanese_dollars != 0 or total_stock_value != 0:
 
         # 為了取得想要隱藏的標籤而做的dictionary
@@ -296,13 +300,22 @@ def home():
         sizes_count = [x for x in list(sizes) if x != 2]
 
         # 因為如果沒有任何資料或是只有其中一個的話,就不需要explode
-        e2 = [0.05 for i in range(
+        e2 = [0.03 for i in range(
             len(sizes_count))]
 
         fig, ax = plt.subplots(figsize=(6, 5))
+
+        # colors=['olivedrab', '#9ACD32', '#15B01A', '#AAFF32', '#008000']
+
+        # color_cash = plt.cm.YlGn(np.linspace(0.3, 0.9, len(sizes)))
         ax.pie(sizes, explode=e2, labels=labels,
-               colors=['olivedrab', '#9ACD32',
-                       '#15B01A', '#AAFF32', '#008000'],
+               colors=[
+                   "#A9C1A9",
+                   "#C8D5B9",
+                   "#B7B7A4",
+                   "#D4A5A5",
+                   "#9BA4B5"
+               ],
                textprops={"size": "15"}, autopct=None, shadow=None)
 
         fig.subplots_adjust(top=1, bottom=0, right=1,
@@ -721,8 +734,7 @@ def stock_delete():
 
     conn.commit()
 
-    # 當使用者刪除某一筆資料後,把頁面重新導回到首頁
-    return redirect("/")
+    return redirect("/stock-inventory")
 
 
 @app.route("/stock-update", methods=["POST"])

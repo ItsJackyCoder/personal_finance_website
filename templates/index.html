@@ -250,14 +250,32 @@
 <div id="chart" style="display: flex; flex-wrap: wrap" >
   <!--去判斷要不要顯示figure-->
   {% if data["show_pic_1"] %}
-  <figure style="flex: 0 1 500px; margin: 10px">
-    <figcaption style="font-size: 18px;">Stock Warehouse Occupancy Chart</figcaption>
+  <figure style="flex: 0 1 500px; margin: 10px; text-align:center">
     <img style="width: 100%" src="/static/piechart.jpg" alt="股票庫存占比圖" />
+    <figcaption style="
+      font-size: 18px; 
+      margin-top: 1rem; 
+      padding: 0.5rem;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      display:inline-block; 
+      background-color:white" >
+      Stock Allocation Chart
+    </figcaption>
   </figure>
   {% endif %} {% if data["show_pic_2"] %}
-  <figure style="flex: 0 1 500px; margin: 15px">
-    <figcaption style="font-size: 18px;">Asset Ratio Chart</figcaption>
+  <figure style="flex: 0 1 500px; margin: 10px; text-align:center">
     <img style="width: 100%" src="/static/piechart2.jpg" alt="資產比例占比圖" />
+    <figcaption style="
+      font-size: 18px; 
+      margin-top: 1rem; 
+      padding: 0.5rem;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      display:inline-block; 
+      background-color:white">
+      Asset Allocation Chart
+    </figcaption>
   </figure>
   {% endif %}
 </div>
@@ -273,6 +291,11 @@
 
   <!--左邊-->
   <span class="lacquer-regular">
+    <img 
+      src="{{ url_for('static', filename='icon/design.gif') }}" 
+      alt="idea"
+      width="30px"
+      height="30px">
     Design by:
     <img
       src="{{ url_for('static', filename='images/pie.jpeg') }}"
