@@ -263,11 +263,31 @@
 </div>
 
 <hr />
-<div id="footer" style="text-align: right; padding: 10px 0">
-  Today's Exchange Rate Data Source:
-  <a href="https://tw.rter.info/howto_currencyapi.php" target="_blank">
-    Global Real-Time Exchange Rate API
-  </a>
+<div id="footer" 
+     style="
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     padding: 10px 0;"
+    >
+
+  <!--左邊-->
+  <span class="lacquer-regular">
+    Design by:
+    <img
+      src="{{ url_for('static', filename='images/pie.jpeg') }}"
+      alt="logo"
+      style="width: 30px; height: 30px; margin-left: 8px"
+    />
+  </span>
+
+  <!--右邊-->
+  <span>
+    Today's Exchange Rate Data Source:
+    <a href="https://tw.rter.info/howto_currencyapi.php" target="_blank">
+      Global Real-Time Exchange Rate API
+    </a>
+  </span>
 </div>
 </div> <!--虛化結束-->
 
