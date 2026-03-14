@@ -13,11 +13,12 @@
 <div id="main-content">
   <div id="stock-info">
     <!--&#x1F4C8;是股票的emoji-->
-    <h3>
-      Stock Holdings 📈
+    <h3 style="height: 50px">
+      Stock Holdings {% if data["updated_time"] != 0 %}
       <span style="font-size: 20px; font-weight: bold; font-style: italic">
         (Last updated: {{ data["updated_time"] }})
       </span>
+      {% endif %}
     </h3>
     <table class="table" style="text-align: center">
       <thead class="table-success">
@@ -95,6 +96,13 @@
               />
               <button class="btn btn-outline-success">Details</button>
             </form>
+          </td>
+        </tr>
+
+        {% else %}
+        <tr>
+          <td colspan="9" style="text-align: center; color: gray">
+            No Records
           </td>
         </tr>
         {% endfor %}

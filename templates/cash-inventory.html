@@ -2,7 +2,7 @@
 <div id="main-content">
   <div id="cash-info">
     <!--&#x1F4B5;是鈔票的emoji-->
-    <h3>Cash Transaction Records</h3>
+    <h3 style="height: 50px">Cash Transaction Records</h3>
     <table class="table" style="text-align: center">
       <thead class="table-success">
         <tr>
@@ -52,6 +52,12 @@
               <input type="hidden" name="updateId" value="{{data[0]}}" />
               <button class="btn btn-outline-success">Update</button>
             </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="6" style="text-align: center; color: gray">
+            No Records
           </td>
         </tr>
         {% endfor %}

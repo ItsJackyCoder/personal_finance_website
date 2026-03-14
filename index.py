@@ -43,8 +43,6 @@ token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJkYXRlIjoiMjAyNi0wMy0xMiAxNDoxMD
 
 def current_time():  # 取得目前的時間
     return datetime.now(ZoneInfo("Asia/Taipei"))
-    # return now.strftime("%Y-%m-%d %H:%M:%S")
-    # latest_time = now.strftime("%Y-%m-%d")
 
 
 def get_db():
@@ -110,7 +108,10 @@ def home():
     today_3pm = datetime.combine(current_time().date(), time(
         15, 0), tzinfo=ZoneInfo("Asia/Taipei"))
 
-    if current_time() >= today_3pm and (last_updated_time is None or last_updated_time < today_3pm):
+    # 判斷是否為交易日(週一～週五)
+    is_weekday = current_time().weekday() < 5
+
+    if is_weekday and current_time() >= today_3pm and (last_updated_time is None or last_updated_time < today_3pm):
         cursor.execute(
             "SELECT DISTINCT stock_id FROM stock WHERE userID = %s", (userID,))
 
@@ -253,7 +254,7 @@ def home():
 
         ax.pie(sizes, explode=e1, labels=labels,
                colors=color_stock,
-               textprops={"size": "15"}, autopct=None, shadow=None)
+               textprops={"size": "13"}, autopct=None, shadow=None)
 
         fig.subplots_adjust(top=1, bottom=0, right=1,
                             left=0, hspace=0, wspace=0)
@@ -316,7 +317,7 @@ def home():
                    "#D4A5A5",
                    "#9BA4B5"
                ],
-               textprops={"size": "15"}, autopct=None, shadow=None)
+               textprops={"size": "13"}, autopct=None, shadow=None)
 
         fig.subplots_adjust(top=1, bottom=0, right=1,
                             left=0, hspace=0, wspace=0)

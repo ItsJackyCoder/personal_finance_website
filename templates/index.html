@@ -192,10 +192,10 @@
     </thead>
     <tbody>
       <tr>
-        <td>{{"{:,}".format(data["td"])}}</td>
-        <td>{{"{:,}".format(data["ud"])}}</td>
-        <td>{{data["currency"]}} TWD</td>
-        <td>{{"{:,}".format(data["total"])}} TWD</td>
+        <td>{{"{:,}".format(data["td"]) if data["td"] }}</td>
+        <td>{{"{:,}".format(data["ud"]) if data["ud"] }}</td>
+        <td>{{data["currency"]~ "TWD" if data["currency"] }}</td>
+        <td>{{"{:,}".format(data["total"]) ~ " TWD" if data["total"] }}</td>
       </tr>
     </tbody>
   </table>
@@ -231,12 +231,17 @@
       {% for d in data["total_stock_info"] %}
       <tr>
         <!--這裡的d是一個dictionary-->
-        <td style="vertical-align: middle; text-align:center">{{"{:,}".format(d["total_stock_value"])}}</td>
-        <td style="vertical-align: middle">{{"{:,}".format(d["total_stock_cost"])}}</td>
-        <td style="vertical-align: middle" class="{% if d['total_profit'] < 0 %} text-success{% else %} text-danger{% endif %}">
-          {% if d["total_profit"] < 0 %} -{{ "{:,}".format(d["total_profit"]|abs) }}
-          {% else %} +{{ "{:,}".format(d["total_profit"]) }}
-          {% endif %}
+        <td style="vertical-align: middle; text-align:center">{{"{:,}".format(d["total_stock_value"]) if d["total_stock_value"] }}</td>
+        <td style="vertical-align: middle">{{"{:,}".format(d["total_stock_cost"]) if d["total_stock_cost"] }}</td>
+        <td style="vertical-align: middle" 
+            class="{% if d['total_profit'] < 0 %} text-success{% else %} text-danger{% endif %}">
+            {% if d["total_stock_cost"] != 0 %}
+              {% if d["total_profit"] < 0 %} -{{ "{:,}".format(d["total_profit"]|abs) }}
+              {% else %} +{{ "{:,}".format(d["total_profit"]) }}
+              {% endif %}
+            {% else %}
+              &nbsp;
+            {% endif %}
         </td>
       </tr>
       {% endfor %}
@@ -253,7 +258,7 @@
   <figure style="flex: 0 1 500px; margin: 10px; text-align:center">
     <img style="width: 100%" src="/static/piechart.jpg" alt="股票庫存占比圖" />
     <figcaption style="
-      font-size: 18px; 
+      font-size: 22px; 
       margin-top: 1rem; 
       padding: 0.5rem;
       border-radius: 15px;
@@ -267,7 +272,7 @@
   <figure style="flex: 0 1 500px; margin: 10px; text-align:center">
     <img style="width: 100%" src="/static/piechart2.jpg" alt="資產比例占比圖" />
     <figcaption style="
-      font-size: 18px; 
+      font-size: 22px; 
       margin-top: 1rem; 
       padding: 0.5rem;
       border-radius: 15px;
@@ -280,7 +285,9 @@
   {% endif %}
 </div>
 
-<hr />
+{% if data["total_stock_info"] and data["total_stock_info"][0]["total_stock_cost"] != 0 %}
+  <hr />
+{% endif %}
 <div id="footer" 
      style="
      display: flex;
