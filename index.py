@@ -499,8 +499,7 @@ def cash_delete():
 
     conn.commit()
 
-    # 當使用者刪除某一筆資料後,把頁面重新導回到首頁
-    return redirect("/")
+    return redirect("/cash-inventory")
 
 
 @app.route("/cash-update", methods=["POST"])
