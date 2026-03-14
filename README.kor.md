@@ -37,24 +37,24 @@
     참고:
     새 계정을 등록해 직접 사용해 보시거나, 위의 계정과 비밀번호로 바로 로그인할 수 있습니다.
     
-#### 로그인 화면
+#### 로그인 화면:
 ![](static/images/login.png)
 
-#### 회원가입 화면
+#### 회원가입 화면:
 ![](static/images/register.png)
 
-#### 메인 대시보드
+#### 메인 대시보드:
 ![](static/images/homepage-1.png)
 ![](static/images/homepage-2.png)
 
-#### 현금 거래 입력
+#### 현금 거래 입력:
 ![](static/images/cash_form.png)
 
-#### 주식 거래 입력
+#### 주식 거래 입력:
 ![](static/images/stock_form.png)
 
-#### 현금 거래 내역
+#### 현금 거래 내역:
 ![](static/images/cash_transaction_records.png)
 
-#### 주식 보유 현황
+#### 주식 보유 현황:
 ![](static/images/stock_holdings.png)
