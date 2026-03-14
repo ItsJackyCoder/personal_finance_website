@@ -39,17 +39,24 @@ User Interface
     You can register a new account to try it out, 
     or log in directly using the provided account and password.
     
+#### Login Page:
+![](static/images/login.png)
+
+#### Registration Page:
+![](static/images/register.png)
+
 #### Home Page:
-![](static/images/homepage.png)
+![](static/images/homepage-1.png)
+![](static/images/homepage-2.png)
 
-#### Cash Inventory:
-![](static/images/cash_inventory.png)
+#### Cash Entry Page:
+![](static/images/cash_form.png)
 
-#### Stock Inventory:
-![](static/images/stock_inventory.png)
+#### Stock Entry Page:
+![](static/images/stock_form.png)
 
-#### Cash Record:
-![](static/images/cash_record.png)
+#### Cash Transaction Records:
+![](static/images/cash_transaction_records.png)
 
-#### Stock Record:
-![](static/images/stock_record.png)
+#### Stock Holdings:
+![](static/images/stock_holdings.png)
