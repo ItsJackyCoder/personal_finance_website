@@ -30,7 +30,6 @@ DB_CONFIG = {
     'database': os.environ.get("DB_NAME"),  # 資料庫名稱
 }
 
-
 mysql_pool = mysql.connector.pooling.MySQLConnectionPool(
     pool_name="mysql_pool",
     pool_size=8,

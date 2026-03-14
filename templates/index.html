@@ -29,12 +29,19 @@
   <div id="loginPage" class="modal-dialog"> <!--測試-->
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Welcome👏👏👏</h5>
+        <h5 class="modal-title" id="exampleModalLabel">
+          Welcome
+          <img 
+            src="{{ url_for('static', filename='icon/Welcome.gif') }}" 
+            alt="welcome"
+            width="30px"
+            height="30px">
+        </h5>
       </div>
       <div id= "loginForm" class="modal-body">
-        Welcome to the cash and stock warehouse management system! (version: 2026.03.11)<br /><br />
-        This is just a test webpage, no need to worry.<br /><br />
-        The purpose of this webpage is to manage and track the changes in cash and stock storage.<br /><br />
+        Welcome to the Cash and Stock Warehouse Management System! (version: 2026.03.14)<br /><br />
+        This is a demonstration webpage, there is no need to worry.<br /><br />
+        The purpose of this system is to help manage and track the changes in cash and stock inventory.<br /><br />
 
         <!-- 表單開始 --> 
         <!--提交form到後端要記得寫method="POST"-->
@@ -175,6 +182,7 @@
     <small>
       <a href="{{ url_for('cash_inventory') }}" style="margin-left:15px">
         <img src="{{ url_for('static', filename='icon/click.gif') }}" 
+             class="hover-scale" 
              title="View Cash Inventory"
              width="40">
         </img>
@@ -213,6 +221,7 @@
     <small>
       <a href="{{ url_for('stock_inventory') }}" style="margin-left:15px">
         <img src="{{ url_for('static', filename='icon/click.gif') }}" 
+             class="hover-scale" 
              title="View Stock Inventory"
              width="40">
         </img>
@@ -258,7 +267,7 @@
   <figure style="flex: 0 1 500px; margin: 10px; text-align:center">
     <img style="width: 100%" src="/static/piechart.jpg" alt="股票庫存占比圖" />
     <figcaption style="
-      font-size: 22px; 
+      font-size: 18px; 
       margin-top: 1rem; 
       padding: 0.5rem;
       border-radius: 15px;
@@ -272,7 +281,7 @@
   <figure style="flex: 0 1 500px; margin: 10px; text-align:center">
     <img style="width: 100%" src="/static/piechart2.jpg" alt="資產比例占比圖" />
     <figcaption style="
-      font-size: 22px; 
+      font-size: 18px; 
       margin-top: 1rem; 
       padding: 0.5rem;
       border-radius: 15px;
@@ -312,8 +321,18 @@
   </span>
 
   <!--右邊-->
-  <span>
-    Today's Exchange Rate Data Source:
+  <span> 
+    <a href="https://tw.rter.info/howto_currencyapi.php" 
+       style="text-decoration: none;"
+       target="_blank">
+      <img 
+        src="{{ url_for('static', filename='icon/external_link.png') }}" 
+        alt="external_link"
+        class="hover-scale"
+        width="30px"
+        height="30px">
+    </a>
+      Data Source (Exchange Rates):
     <a href="https://tw.rter.info/howto_currencyapi.php" target="_blank">
       Global Real-Time Exchange Rate API
     </a>
@@ -458,17 +477,14 @@
       // 隱藏登入表單，顯示註冊表單
       document.getElementById('registrationForm').style.display = 'block';
       document.getElementById('loginPage').style.display = 'none';
-      document.getElementById('exampleModalLabel').textContent = "註冊帳號";
-
-      //可以用來測試button是否有被click
-      // alert("註冊按鈕被點擊了！");
+      //document.getElementById('exampleModalLabel').textContent = "註冊帳號";
     }
 
     function showLoginForm() {
       // 隱藏註冊表單，顯示登入表單
       document.getElementById('loginPage').style.display = 'block';
       document.getElementById('registrationForm').style.display = 'none';
-      document.getElementById('exampleModalLabel').textContent = "歡迎👏👏👏";
+      //document.getElementById('exampleModalLabel').textContent = "歡迎👏👏👏";
     }
 </script>
 

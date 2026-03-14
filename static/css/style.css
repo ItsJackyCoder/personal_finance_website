@@ -9,3 +9,43 @@
   font-weight: 400;
   font-style: normal;
 }
+
+.nav-link:hover {
+  transform: scale(1.15);
+  transition: transform 0.2s ease;
+}
+
+/* 鼠標移過去會放大 */
+.hover-scale:hover {
+  transform: scale(1.15);
+  transition: transform 0.2s ease;
+}
+
+#username {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+#username:hover {
+  animation: jump 0.75s ease;
+}
+
+@keyframes jump {
+  0% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-8px);
+  }
+  50% {
+    transform: translateY(0);
+  }
+  70% {
+    transform: translateY(-4px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
