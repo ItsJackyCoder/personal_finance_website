@@ -37,17 +37,24 @@
     참고:
     새 계정을 등록해 직접 사용해 보시거나, 위의 계정과 비밀번호로 바로 로그인할 수 있습니다.
     
-#### 홈 페이지:
-![](static/images/homepage.png)
+#### 로그인 화면
+![](static/images/login.png)
 
-#### 현금 보유 현황:
-![](static/images/cash_inventory.png)
+#### 회원가입 화면
+![](static/images/register.png)
 
-#### 주식 보유 현황:
-![](static/images/stock_inventory.png)
+#### 메인 대시보드
+![](static/images/homepage-1.png)
+![](static/images/homepage-2.png)
 
-#### 현금 기록:
-![](static/images/cash_record.png)
+#### 현금 거래 입력
+![](static/images/cash_form.png)
 
-#### 주식 기록:
-![](static/images/stock_record.png)
+#### 주식 거래 입력
+![](static/images/stock_form.png)
+
+#### 현금 거래 내역
+![](static/images/cash_transaction_records.png)
+
+#### 주식 보유 현황
+![](static/images/stock_holdings.png)
