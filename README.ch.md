@@ -35,18 +35,25 @@
     
     備註:
     你可以註冊新帳號試用，或直接使用提供的帳號與密碼登入。
-    
+
+#### 登入頁面:
+![](static/images/login.png)
+
+#### 註冊頁面:
+![](static/images/register.png)
+
 #### 首頁:
-![](static/images/homepage.png)
+![](static/images/homepage-1.png)
+![](static/images/homepage-2.png)
 
-#### 現金存量頁面:
-![](static/images/cash_inventory.png)
-
-#### 股票存量頁面:
-![](static/images/stock_inventory.png)
-
-#### 現金紀錄頁面:
-![](static/images/cash_record.png)
+#### 現金記帳頁面:
+![](static/images/cash_form.png)
 
 #### 股票紀錄頁面:
-![](static/images/stock_record.png)
+![](static/images/stock_form.png)
+
+#### 現金明細頁面:
+![](static/images/cash_transaction_records.png)
+
+#### 股票明細頁面:
+![](static/images/stock_holdings.png)
