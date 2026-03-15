@@ -4,7 +4,7 @@
 # g:flask連接資料庫所需要的東西
 # redirect:可以讓使用者導回主畫面的模組
 from mysql.connector import pooling  # 連線池
-from datetime import date, datetime, time
+from datetime import date, datetime, time, timedelta
 from zoneinfo import ZoneInfo
 import mysql.connector  # MySQL資料庫
 import os  # 為了隱藏圓餅圖的文字(如果static裡面沒有資料就不顯示文字)
@@ -30,7 +30,6 @@ DB_CONFIG = {
     'database': os.environ.get("DB_NAME"),  # 資料庫名稱
 }
 
-
 mysql_pool = mysql.connector.pooling.MySQLConnectionPool(
     pool_name="mysql_pool",
     pool_size=8,
@@ -43,6 +42,29 @@ token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJkYXRlIjoiMjAyNi0wMy0xMiAxNDoxMD
 
 def current_time():  # 取得目前的時間
     return datetime.now(ZoneInfo("Asia/Taipei"))
+
+
+def get_stock_date():
+    now = datetime.now(ZoneInfo("Asia/Taipei"))
+    weekday = now.weekday()   # Monday=0 ... Sunday=6
+
+    # 週六
+    if weekday == 5:
+        target_date = now - timedelta(days=1)
+
+    # 週日
+    elif weekday == 6:
+        target_date = now - timedelta(days=2)
+
+    # 週一～週五 且時間 < 15:00
+    elif now.hour < 15:
+        target_date = now - timedelta(days=1)
+
+    # 情況4：週一～週五 且時間 >= 15:00
+    else:
+        target_date = now
+
+    return target_date.strftime("%Y-%m-%d")
 
 
 def get_db():
@@ -475,6 +497,7 @@ def submit_cash():  # 可以接收到使用者提交出來的資料
     if transaction_id != "":  # 如果是非空字串,代表是修改資料
         cursor.execute("UPDATE cash SET taiwanese_dollars=%s, us_dollars=%s, note=%s, date_info=%s WHERE transaction_id=%s",
                        (taiwanese_dollars, us_dollars, note, date, transaction_id))
+
     else:
         # transaction_id會自己去生成
         cursor.execute("INSERT INTO cash (taiwanese_dollars, us_dollars, note, date_info, userID) VALUES (%s, %s, %s, %s, %s)",
@@ -482,8 +505,7 @@ def submit_cash():  # 可以接收到使用者提交出來的資料
 
     conn.commit()
 
-    # 3.將使用者導回主頁面
-    return redirect("/")
+    return redirect("/cash-inventory")
 
 
 @app.route("/cash-delete", methods=["POST"])
@@ -552,9 +574,10 @@ def submit_stock():  # 提交股票資料時
     userID = session.get('user_id')
 
     # stock price
+    # 有bug,之後得修!
     url = "https://api.finmindtrade.com/api/v4/data?dataset=TaiwanStockPrice&data_id=" + \
         request.values['stock-id'] + "&start_date=" + \
-        current_time().strftime("%Y-%m-%d") + "&token=" + token
+        get_stock_date() + "&token=" + token
 
     response = requests.get(url)
     data = response.json()
@@ -601,7 +624,7 @@ def submit_stock():  # 提交股票資料時
 
     # transaction_id可以不用管它
     cursor.execute("INSERT INTO stock (stock_id, stock_name, stock_num, stock_price, processing_fee, tax, date_info, userID, last_updated_time,current_price) VALUES (%s,%s,%s, %s, %s, %s, %s, %s, %s, %s)",
-                   (stock_id, None, stock_num, stock_price, processing_fee, tax, date, userID, current_time().strftime("%Y-%m-%d %H:%M:%S"), current_price))
+                   (stock_id, None, stock_num, stock_price, processing_fee, tax, date, userID, get_stock_date(), current_price))
 
     conn.commit()
 
@@ -619,8 +642,7 @@ def submit_stock():  # 提交股票資料時
 
         conn.commit()
 
-    # 3.將使用者導回主頁面
-    return redirect("/")
+    return redirect("/stock-inventory")
 
 
 @app.route("/stock-inventory")
@@ -788,7 +810,7 @@ def stock_sell():
 
             break
 
-    return redirect("/")
+    return redirect("/stock-inventory")
 
 
 @app.route("/stock-statement", methods=["POST"])
