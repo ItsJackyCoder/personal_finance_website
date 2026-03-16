@@ -23,11 +23,18 @@ app = Flask(__name__)
 app.secret_key = os.urandom(24)  # 使用隨機生成的密鑰
 
 # MySQL資料庫配置
+# DB_CONFIG = {
+#     'host': os.environ.get("DB_HOST"),  # MySQL主機地址
+#     'user': os.environ.get("DB_USER"),  # 使用者名稱
+#     'password': os.environ.get("DB_PASSWORD"),  # 密碼
+#     'database': os.environ.get("DB_NAME"),  # 資料庫名稱
+# }
+
 DB_CONFIG = {
-    'host': os.environ.get("DB_HOST"),  # MySQL主機地址
-    'user': os.environ.get("DB_USER"),  # 使用者名稱
-    'password': os.environ.get("DB_PASSWORD"),  # 密碼
-    'database': os.environ.get("DB_NAME"),  # 資料庫名稱
+    'host': "136.109.201.2",  # MySQL主機地址
+    'user': "jacky",  # 使用者名稱
+    'password': "#Funny0806boy",  # 密碼
+    'database': "finance-website",  # 資料庫名稱
 }
 
 mysql_pool = mysql.connector.pooling.MySQLConnectionPool(
