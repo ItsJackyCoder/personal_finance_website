@@ -48,19 +48,23 @@ def get_stock_date():
     now = datetime.now(ZoneInfo("Asia/Taipei"))
     weekday = now.weekday()   # Monday=0 ... Sunday=6
 
-    # 週六
+    # 週六 → 抓週五
     if weekday == 5:
         target_date = now - timedelta(days=1)
 
-    # 週日
+    # 週日 → 抓週五
     elif weekday == 6:
         target_date = now - timedelta(days=2)
 
-    # 週一～週五 且時間 < 15:00
-    elif now.hour < 15:
+    # 週一 且時間 < 15:00 → 抓上週五
+    elif weekday == 0 and now.hour < 15:
+        target_date = now - timedelta(days=3)
+
+    # 週二～週五 且時間 < 15:00 → 抓前一天
+    elif weekday < 5 and now.hour < 15:
         target_date = now - timedelta(days=1)
 
-    # 情況4：週一～週五 且時間 >= 15:00
+    # 週一～週五 且時間 >= 15:00 → 抓今天
     else:
         target_date = now
 
@@ -126,14 +130,15 @@ def home():
             tzinfo=ZoneInfo("Asia/Taipei")
         )
 
-    # 更新收盤價(每日下午3點後)
-    today_3pm = datetime.combine(current_time().date(), time(
-        15, 0), tzinfo=ZoneInfo("Asia/Taipei"))
+    stock_date = get_stock_date()
 
-    # 判斷是否為交易日(週一～週五)
-    is_weekday = current_time().weekday() < 5
+    # 目前這個時間點，資料至少應該更新到 stock_date 這一天
+    required_update_time = datetime.strptime(
+        stock_date + " 15:00:00", "%Y-%m-%d %H:%M:%S"
+    ).replace(tzinfo=ZoneInfo("Asia/Taipei"))
 
-    if is_weekday and current_time() >= today_3pm and (last_updated_time is None or last_updated_time < today_3pm):
+    # 如果最後更新時間比「應該有的最後交易日 15:00」還早，就要重抓
+    if last_updated_time is None or last_updated_time < required_update_time:
         cursor.execute(
             "SELECT DISTINCT stock_id FROM stock WHERE userID = %s", (userID,))
 
@@ -144,7 +149,7 @@ def home():
 
             url = "https://api.finmindtrade.com/api/v4/data?dataset=TaiwanStockPrice&data_id=" + \
                 stock_id + "&start_date=" + \
-                current_time().strftime("%Y-%m-%d") + "&token=" + token
+                stock_date + "&token=" + token
 
             response = requests.get(url)
             api_data = response.json()
