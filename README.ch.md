@@ -18,19 +18,17 @@
 - 雲端服務: `Google Cloud Platform(GCP)`, `Render`
 - API:[Global Real-Time Exchange Rate API](https://tw.rter.info/howto_currencyapi.php)
 
-## 使用者介面
+## 測試帳號
 
-    帳號:wang569
-    密碼:12345
+| 帳號 | 密碼 |
+| --- | --- |
+| wang569 | 12345 |
+| cindy0925 | flyaway |
+| amy54yun | 25896 |
 
-    帳號:cindy0925
-    密碼:flyaway
+> 你也可以註冊新帳號試用，或直接使用上述測試帳號登入。
 
-    帳號:amy54yun
-    密碼:25896
-
-    備註:
-    你可以註冊新帳號試用，或直接使用提供的帳號與密碼登入。
+## 使用者介面:
 
 #### 登入頁面:
 
