@@ -15,7 +15,7 @@
 - 前端:`JavaScript`, `HTML`, `CSS`
 - 框架: `Bootstrap`, `Flask`
 - 資料庫:`MySQL`(Used `SQLite3` for testing)
-- 雲端服務: `Google Cloud Platform(GCP)`, `Render`
+- 雲端服務: `TiDB Cloud`, `Render`
 - API:[Global Real-Time Exchange Rate API](https://tw.rter.info/howto_currencyapi.php)
 
 ## 測試帳號
