@@ -20,20 +20,17 @@ This website is designed to display the user's inventory of Taiwanese currency, 
 - Cloud Services: `Google Cloud Platform(GCP)`, `Render`
 - API:[Global Real-Time Exchange Rate API](https://tw.rter.info/howto_currencyapi.php)
 
+## Test Accounts
+
+| Email | Password |
+| --- | --- |
+| wang569 | 12345 |
+| cindy0925 | flyaway |
+| amy54yun | 25896 |
+
+> 새로운 계정을 직접 생성하여 이용하시거나, 위의 테스트 계정으로 로그인하여 기능을 확인하실 수 있습니다.
+
 ## User Interface
-
-    Account:wang569
-    Password:12345
-
-    Account:cindy0925
-    Password:flyaway
-
-    Account:amy54yun
-    Password:25896
-
-    Note:
-    You can register a new account to try it out,
-    or log in directly using the provided account and password.
 
 #### Login Page:
 
