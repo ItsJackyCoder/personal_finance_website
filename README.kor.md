@@ -16,7 +16,7 @@
 - 프론트엔드:`JavaScript`, `HTML`, `CSS`
 - 프레임워크: `Bootstrap`, `Flask`
 - 데이터베이스:`MySQL`(Used `SQLite3` for testing)
-- 클라우드 서비스: `Google Cloud Platform(GCP)`, `Render`
+- 클라우드 서비스: `TiDB Cloud`, `Render`
 - API:[Global Real-Time Exchange Rate API](https://tw.rter.info/howto_currencyapi.php)
 
 ## 테스트 계정
