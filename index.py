@@ -25,19 +25,18 @@ app.secret_key = os.urandom(24)  # 使用隨機生成的密鑰
 # MySQL資料庫配置
 DB_CONFIG = {
     'host': os.environ.get("DB_HOST"),  # MySQL主機地址
+    'port': os.environ.get("DB_PORT"),  # port
     'user': os.environ.get("DB_USER"),  # 使用者名稱
     'password': os.environ.get("DB_PASSWORD"),  # 密碼
     'database': os.environ.get("DB_NAME"),  # 資料庫名稱
 }
+
 
 mysql_pool = mysql.connector.pooling.MySQLConnectionPool(
     pool_name="mysql_pool",
     pool_size=8,
     **DB_CONFIG
 )
-
-# Findmind的token
-token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJkYXRlIjoiMjAyNi0wMy0xMiAxNDoxMDoxNyIsInVzZXJfaWQiOiJqYWNreTUzNzI4IiwiZW1haWwiOiJqYWNreTUzNzI4QGdtYWlsLmNvbSIsImlwIjoiNjEuNzQuMzIuMTEyIn0.cXnO9npd-rvHzZ94WGIC5HlUcFWWOnDgB5K3o9hmf-0"
 
 
 def current_time():  # 取得目前的時間
@@ -74,6 +73,8 @@ def get_stock_date():
 def get_db():
     if not hasattr(g, "mysql_db"):
         g.mysql_db = mysql_pool.get_connection()  # 從連線池中獲取連線
+
+        print("成功連線上DB......")
 
     return g.mysql_db
 
@@ -149,7 +150,7 @@ def home():
 
             url = "https://api.finmindtrade.com/api/v4/data?dataset=TaiwanStockPrice&data_id=" + \
                 stock_id + "&start_date=" + \
-                stock_date + "&token=" + token
+                stock_date + "&token=" + os.environ.get("TOKEN")
 
             response = requests.get(url)
             api_data = response.json()
@@ -582,7 +583,7 @@ def submit_stock():  # 提交股票資料時
     # 有bug,之後得修!
     url = "https://api.finmindtrade.com/api/v4/data?dataset=TaiwanStockPrice&data_id=" + \
         request.values['stock-id'] + "&start_date=" + \
-        get_stock_date() + "&token=" + token
+        get_stock_date() + "&token=" + os.environ.get("TOKEN")
 
     response = requests.get(url)
     data = response.json()
@@ -633,7 +634,7 @@ def submit_stock():  # 提交股票資料時
 
     conn.commit()
 
-    if len(stock_info) == 0:  # 沒找到資料
+    if len(stock_info) == 0:  # 目前沒此股票的資料的話
         # stock name
         url = "https://api.finmindtrade.com/api/v4/data?dataset=TaiwanStockInfo&data_id=" + stock_id
 
