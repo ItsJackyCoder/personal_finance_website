@@ -19,19 +19,17 @@
 - 클라우드 서비스: `Google Cloud Platform(GCP)`, `Render`
 - API:[Global Real-Time Exchange Rate API](https://tw.rter.info/howto_currencyapi.php)
 
+## 테스트 계정
+
+| 이메일 | 비밀번호 |
+| --- | --- |
+| wang569 | 12345 |
+| cindy0925 | flyaway |
+| amy54yun | 25896 |
+
+> 새로운 계정을 직접 생성하여 이용하시거나, 위의 테스트 계정으로 로그인하여 기능을 확인하실 수 있습니다.
+
 ## 사용자 인터페이스
-
-    아이디:wang569
-    비밀번호:12345
-
-    아이디:cindy0925
-    비밀번호:flyaway
-
-    아이디:amy54yun
-    비밀번호:25896
-
-    참고:
-    새 계정을 등록해 직접 사용해 보시거나, 위의 계정과 비밀번호로 바로 로그인할 수 있습니다.
 
 #### 로그인 화면:
 
