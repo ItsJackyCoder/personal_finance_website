@@ -17,7 +17,7 @@ This website is designed to display the user's inventory of Taiwanese currency, 
 - Frontend:`JavaScript`, `HTML`, `CSS`
 - Frameworks: `Bootstrap`, `Flask`
 - Database:`MySQL`(Used `SQLite3` for testing)
-- Cloud Services: `Google Cloud Platform(GCP)`, `Render`
+- Cloud Services: `TiDB Cloud`, `Render`
 - API:[Global Real-Time Exchange Rate API](https://tw.rter.info/howto_currencyapi.php)
 
 ## Test Accounts
